@@ -12,7 +12,7 @@ payload['STARTDATETIME'] = '20190101000000'
 payload['ENDDATETIME'] = '20200601000000'
 payload['MAXRECORDS'] = '250'
 
-# testing GDELT DOC API request for November 2019
+# testing GDELT DOC API request for 2019 - 2020
 resp = requests.get(gdeltAPI, params=payload)
 results = resp.json()
 
