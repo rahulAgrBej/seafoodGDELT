@@ -10,6 +10,7 @@ payload['MODE'] = 'ArtList'
 payload['FORMAT'] = 'JSON'
 payload['STARTDATETIME'] = '20170101000000'
 payload['ENDDATETIME'] = '20180101000000'
+payload['MAXRECORDS'] = '250'
 
 # testing GDELT DOC API request for November 2019
 resp = requests.get(gdeltAPI, params=payload)
