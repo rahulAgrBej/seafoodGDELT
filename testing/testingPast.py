@@ -5,11 +5,11 @@ import pprint
 gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
 
 payload = {}
-payload['QUERY'] = 'seafood outbreak'
+payload['QUERY'] = 'seafood "COVID-19"'
 payload['MODE'] = 'ArtList'
 payload['FORMAT'] = 'JSON'
-payload['STARTDATETIME'] = '20170101000000'
-payload['ENDDATETIME'] = '20180101000000'
+payload['STARTDATETIME'] = '20190101000000'
+payload['ENDDATETIME'] = '20200601000000'
 payload['MAXRECORDS'] = '250'
 
 # testing GDELT DOC API request for November 2019
