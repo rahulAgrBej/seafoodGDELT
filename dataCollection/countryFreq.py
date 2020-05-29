@@ -27,9 +27,6 @@ payload['ENDDATETIME'] = dateEnd
 # Gets a list of all countries in the world
 countriesList = list(pycountry.countries)
 
-# EXAMPLE: will only get articles from Spain
-payload['SOURCECOUNTRY'] = 'ghana'
-
 # make GDELT request for articles for spain mentioning seafood AND "COVID-19" during NOV 2019
 
 
