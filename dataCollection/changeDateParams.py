@@ -9,6 +9,24 @@ def incrementYear(inDate, numYears):
     inDate = str(year) + inDate[4:]
     return inDate
 
-test = '20200101000000'
-print(test)
-print(incrementYear(test, 5))
+def incrementMonth(inDate, numMonths):
+
+    # gets month
+    month = int(inDate[4:6])
+
+    # increments year if necessary
+    if (month + numMonths > 12):
+        inDate = incrementYear(inDate, 1)
+    
+    # increment month
+    month = (month + numMonths) % 12
+    if (month == 0):
+        month = 12
+    
+    # accounting for single digit ints
+    if (month < 10):
+        month = '0' + str(month)
+    
+    inDate = inDate[:4] + str(month) + inDate[6:]
+
+    return inDate
