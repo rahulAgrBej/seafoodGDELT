@@ -8,7 +8,6 @@ from changeDateParams import incrementMonth, incrementYear
 gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
 
 payload = {}
-payload['QUERY'] = 'seafood "COVID-19" sourcecountry:GH'
 payload['MODE'] = 'ArtList'
 payload['FORMAT'] = 'JSON'
 
@@ -25,30 +24,36 @@ payload['STARTDATETIME'] = dateStart
 payload['ENDDATETIME'] = dateEnd
 
 # Gets a list of all countries in the world
-countriesList = list(pycountry.countries)
+# countriesList = list(pycountry.countries)
+countryList = ['GH', 'TH', 'NO', 'VM', 'Chile']
 
 countryFreq = {}
-countryFreq['Ghana'] = []
+for country in countryList:
+    countryFreq[country] = []
+
 # make GDELT request for articles for spain mentioning seafood AND "COVID-19" during NOV 2019
 for i in range(5):
+
+    for country in countryList:
+        payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + country
+        resp = requests.get(gdeltAPI, params=payload)
+        results = resp.json()
     
-    resp = requests.get(gdeltAPI, params=payload)
-    print(f'response code: {resp.status_code}')
-    results = resp.json()
-    
-    if len(results.keys()) != 0:
-        countryFreq['Ghana'].append(len(results['articles']))
-    else:
-        countryFreq['Ghana'].append(0)
-    
-    print(countryFreq['Ghana'])
+        if len(results.keys()) != 0:
+            countryFreq[country].append(len(results['articles']))
+        else:
+            countryFreq[country].append(0)
     
     payload['STARTDATETIME'] = payload['ENDDATETIME']
     payload['ENDDATETIME'] = incrementMonth(payload['ENDDATETIME'], 1)
 
-pp = pprint.PrettyPrinter(indent=2)
-pp.pprint(results)
 
-plt.scatter([1, 2, 3, 4, 5], countryFreq['Ghana'])
-plt.plot([1, 2, 3, 4, 5], countryFreq['Ghana'])
+for country in countryList: 
+    print(f'{country} {countryFreq[country]}')
+"""
+monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
+
+plt.scatter(monthNames, countryFreq['Ghana'])
+plt.plot(monthNames, countryFreq['Ghana'])
 plt.show()
+"""
