@@ -27,19 +27,28 @@ payload['ENDDATETIME'] = dateEnd
 # Gets a list of all countries in the world
 countriesList = list(pycountry.countries)
 
+countryFreq = {}
+countryFreq['Ghana'] = []
 # make GDELT request for articles for spain mentioning seafood AND "COVID-19" during NOV 2019
-
-
-for i in range(4):
+for i in range(5):
+    
     resp = requests.get(gdeltAPI, params=payload)
     print(f'response code: {resp.status_code}')
     results = resp.json()
+    
     if len(results.keys()) != 0:
-        print(len(results['articles']))
+        countryFreq['Ghana'].append(len(results['articles']))
     else:
-        print(0)
+        countryFreq['Ghana'].append(0)
+    
+    print(countryFreq['Ghana'])
+    
     payload['STARTDATETIME'] = payload['ENDDATETIME']
     payload['ENDDATETIME'] = incrementMonth(payload['ENDDATETIME'], 1)
 
 pp = pprint.PrettyPrinter(indent=2)
 pp.pprint(results)
+
+plt.scatter([1, 2, 3, 4, 5], countryFreq['Ghana'])
+plt.plot([1, 2, 3, 4, 5], countryFreq['Ghana'])
+plt.show()
