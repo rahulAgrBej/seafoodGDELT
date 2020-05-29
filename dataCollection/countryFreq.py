@@ -25,7 +25,7 @@ payload['ENDDATETIME'] = dateEnd
 
 # Gets a list of all countries in the world
 # countriesList = list(pycountry.countries)
-countryList = ['GH', 'TH', 'NO', 'VM', 'Chile']
+countryList = ['GH', 'TH', 'NO', 'VM', 'CI']
 
 countryFreq = {}
 for country in countryList:
@@ -48,12 +48,12 @@ for i in range(5):
     payload['ENDDATETIME'] = incrementMonth(payload['ENDDATETIME'], 1)
 
 
-for country in countryList: 
-    print(f'{country} {countryFreq[country]}')
-"""
 monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
 
-plt.scatter(monthNames, countryFreq['Ghana'])
-plt.plot(monthNames, countryFreq['Ghana'])
+countryScatters = []
+for country in countryList:
+    countryScatters.append(plt.plot(monthNames, countryFreq[country], label=country)) 
+
+plt.legend()
+
 plt.show()
-"""
