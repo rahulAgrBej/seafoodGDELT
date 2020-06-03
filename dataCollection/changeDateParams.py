@@ -74,7 +74,7 @@ def incrementDay(inDate, numDays):
             month = 12
         numMonths += 1
     
-    if (totalDays = 0):
+    if (totalDays == 0):
         totalDays = 1
 
     inDate = incrementMonth(inDate, numMonths)
@@ -91,7 +91,14 @@ def incrementDay(inDate, numDays):
     if (totalDays < 10):
         totalDays = '0' + str(day)
     
-    inDate = inDate[:6] + totalDays + inDate[8:]
+    inDate = inDate[:6] + str(totalDays) + inDate[8:]
 
     return inDate
     
+"""
+#### TESTING ####
+testDate = '20200101000000'
+print(incrementYear(testDate, 5))
+print(incrementMonth(testDate, 14))
+print(incrementDay(testDate,40))
+"""
