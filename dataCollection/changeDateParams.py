@@ -1,4 +1,19 @@
 
+monthDays = {
+    1: 31,
+    2: 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31
+}
+
 def incrementYear(inDate, numYears):
     
     # increments year
@@ -30,3 +45,29 @@ def incrementMonth(inDate, numMonths):
     inDate = inDate[:4] + str(month) + inDate[6:]
 
     return inDate
+
+def incrementDay(inDate, numDays):
+
+    # gets day
+    day = int(inDate[6:8])
+
+    # gets month
+    month = int(inDate[4:6])
+
+    # increments month if necessary
+    if (day + numDays > monthDays[month]):
+        newDate = incrementMonth(inDate, 1)
+    
+    # increment day
+    day = (day + numDays) % monthDays[month]
+    if (day == 0):
+        day = monthDays[month]
+    
+    # accounts for single digit ints
+    if (day < 10):
+        day = '0' + str(day)
+    
+    inDate = inDate[:6] + day + inDate[8:]
+
+    return inDate
+    
