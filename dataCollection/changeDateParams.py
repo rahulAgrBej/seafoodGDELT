@@ -15,6 +15,9 @@ monthEnd = {
     12: 31
 }
 
+def getMonth(inDate):
+    return inDate[4:6]
+
 def incrementYear(inDate, numYears):
     
     # increments year

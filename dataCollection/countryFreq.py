@@ -1,9 +1,9 @@
-import pycountry
+#import pycountry
 import requests
 import json
 import pprint
 import matplotlib.pyplot as plt
-from changeDateParams import incrementDay, incrementMonth, incrementYear
+from changeDateParams import getMonth, incrementDay, incrementMonth, incrementYear
 
 MAX_ARTICLES = 250
 MONTH_END = {
@@ -36,7 +36,6 @@ def collectMonthNums(inURL, inPayload):
 
     resp = requests.get(gdeltAPI, params=inPayload)
     print(resp)
-    print(resp.content)
     results = resp.json()
 
     numArticles = 0
@@ -48,6 +47,7 @@ def collectMonthNums(inURL, inPayload):
             
             # Do a more granular search (day by day search)
             startDay = inPayload['STARTDATETIME']
+            month = int(getMonth(startDay))
             for i in range (MONTH_END[month]):
                 
                 endDay = incrementDay(startDay, 1)
@@ -55,10 +55,10 @@ def collectMonthNums(inURL, inPayload):
                 dailyResp = requests.get(inURL, inPayload)
                 
                 if (len(results.keys()) != 0):
-                    print(results['articles'])
-                    numArticles += results['articles']
+                    numArticles += len(results['articles'])
                 
                 startDay = endDay
+                print(f'Day {i}: {len(results["articles"])}')
         else:
             numArticles = len(results['articles'])
 
@@ -76,7 +76,7 @@ payload['MAXRECORDS'] = '250'
 
 # Will just check the month of November 2019
 # date format YYYYMMDDHHMMSS
-dateStart = '20200101000000'
+dateStart = '20200301000000'
 dateEnd = incrementMonth(dateStart, 1)
 
 # Will only search through articles posted through dateStart-dateEnd
@@ -92,7 +92,10 @@ countryFreq = {}
 for country in countryList:
     countryFreq[country] = []
 """
-
+payload['QUERY'] = 'seafood "COVID-19" sourcecountry:US'
+numUSA = collectMonthNums(gdeltAPI, payload)
+print(numUSA)
+"""
 # make GDELT requests for each country in our list of countries from Jan 2020 - May 2020
 for i in range(5):
     
@@ -101,26 +104,30 @@ for i in range(5):
         countryCode = COUNTRIES[countryIdx][0]
         countryName = COUNTRIES[countryIdx][1]
         payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
-        numArticles = collectMonthNums(gdeltAPI, payload)
+        numSeaCOVID = collectMonthNums(gdeltAPI, payload)
 
         # if its the first time we are getting data for this country
         if not (countryName in countryFreq.keys()):
             countryFreq[countryName] = {}
             countryFreq[countryName]['seafood&COVID-19'] = []
             countryFreq[countryName]['seafood'] = []
+            countryFreq[countryName]['percent'] = []
+            
         
-        countryFreq[countryName]['seafood&COVID-19'].append(numArticles)
+        countryFreq[countryName]['seafood&COVID-19'].append(numSeaCOVID)
         
         payload['QUERY'] = 'seafood sourcecountry:' + countryCode
-        numArticles = collectMonthNums(gdeltAPI, payload)
+        numSea = collectMonthNums(gdeltAPI, payload)
         
-        countryFreq[countryName]['seafood'].append(numArticles)
+        countryFreq[countryName]['seafood'].append(numSea)
+
+        countryFreq[countryName][percent] = (numSeaCOVID / numSea) * 100
     
     payload['STARTDATETIME'] = payload['ENDDATETIME']
     payload['ENDDATETIME'] = incrementMonth(payload['ENDDATETIME'], 1)
     print(countryFreq)
     print()
-
+"""
 """
 monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
 
