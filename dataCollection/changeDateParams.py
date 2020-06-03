@@ -15,6 +15,9 @@ monthEnd = {
     12: 31
 }
 
+def getHour(inDate):
+    return inDate[8:10]
+
 def getMonth(inDate):
     return inDate[4:6]
 
@@ -92,16 +95,60 @@ def incrementDay(inDate, numDays):
     
     # accounts for single digit ints
     if (totalDays < 10):
-        totalDays = '0' + str(day)
+        totalDays = '0' + str(totalDays)
     
     inDate = inDate[:6] + str(totalDays) + inDate[8:]
+    return inDate
+
+def incrementHour(inDate, numHours):
+
+    # get hour
+    hour =  int(inDate[8:10])
+
+    totalHours = hour + numHours
+
+    if (totalHours > 24):
+        numDays = math.floor(totalHours / 24)
+        inDate = incrementDay(inDate, numDays)
+    
+    totalHours = totalHours % 24
+
+    if totalHours < 10:
+        totalHours = '0' + str(totalHours)
+
+    inDate = inDate[:8] + str(totalHours) + inDate[10:]
+
+    return inDate
+
+def incrementMin(inDate, numMins):
+
+    # get minute
+    minute = int(inDate[10:12])
+    totalMins = minute + numMins
+
+    if totalMins > 60:
+        numHours = math.floor(totalMins / 60)
+        inDate = incrementHour(inDate, numHours)
+    
+    totalMins = totalMins % 60
+
+    if totalMins < 10:
+        totalMins = '0' + str(totalMins)
+    
+    inDate = inDate[:10] + str(totalMins) + inDate[12:]
 
     return inDate
     
 """
 #### TESTING ####
-testDate = '20200101000000'
 print(incrementYear(testDate, 5))
 print(incrementMonth(testDate, 14))
 print(incrementDay(testDate,40))
+print(incrementHour(testDate, 1))
+
+
+testDate = '20200101000000'
+print(testDate)
+print(incrementMin(testDate, 54))
+print(incrementMin(testDate, 72))
 """
