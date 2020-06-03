@@ -3,7 +3,52 @@ import requests
 import json
 import pprint
 import matplotlib.pyplot as plt
-from changeDateParams import incrementMonth, incrementYear
+from changeDateParams import incrementDay, incrementMonth, incrementYear
+
+MAX_ARTICLES = 250
+MONTH_END = {
+    1: 31,
+    2: 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    7: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31
+}
+
+def collectMonthNums(inURL, inPayload):
+
+    resp = requests.get(gdeltAPI, params=inPayload)
+    results = resp.json()
+
+    numArticles = 0
+
+    if len(results.keys()) != 0:
+        
+        # if we got the MAX number of article results
+        if results['articles'] >= MAX_ARTICLES:
+            
+            # Do a more granular search (day by day search)
+            startDay = inPayload['STARTDATETIME']
+            for i in range (MONTH_END[month]):
+                
+                endDay = incrementDay(startDay, 1)
+                inPayload['ENDDATETIME'] = endDay
+                dailyResp = requests.get(inURL, inPayload)
+                
+                if (len(results.keys()) != 0):
+                    print(results['articles'])
+                    numArticles += results['articles']
+                
+                startDay = endDay
+
+    return numArticles
+        
 
 gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
 
@@ -56,4 +101,4 @@ for country in countryList:
 
 plt.legend()
 
-plt.show()
+plt.savefig('dataCollection/sample.png')
