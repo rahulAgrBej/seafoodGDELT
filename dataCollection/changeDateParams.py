@@ -1,5 +1,6 @@
+import math
 
-monthDays = {
+monthEnd = {
     1: 31,
     2: 28,
     3: 31,
@@ -29,9 +30,16 @@ def incrementMonth(inDate, numMonths):
     # gets month
     month = int(inDate[4:6])
 
+    totalMonths = month + numMonths
+
     # increments year if necessary
-    if (month + numMonths > 12):
-        inDate = incrementYear(inDate, 1)
+    if (totalMonths > 12):
+
+        # get number of years to increment by
+        numYears = math.floor(totalMonths / 12)
+
+        # get number of years to increment
+        inDate = incrementYear(inDate, numYears)
     
     # increment month
     month = (month + numMonths) % 12
@@ -54,20 +62,36 @@ def incrementDay(inDate, numDays):
     # gets month
     month = int(inDate[4:6])
 
+    totalDays = day + numDays
+
+    numMonths = 0
+
     # increments month if necessary
-    if (day + numDays > monthDays[month]):
-        newDate = incrementMonth(inDate, 1)
+    while (totalDays > monthEnd[month]):
+        totalDays = totalDays - monthEnd[month]
+        month = (month + 1) % 12
+        if month == 0:
+            month = 12
+        numMonths += 1
     
+    if (totalDays = 0):
+        totalDays = 1
+
+    inDate = incrementMonth(inDate, numMonths)
+
     # increment day
-    day = (day + numDays) % monthDays[month]
-    if (day == 0):
-        day = monthDays[month]
+    totalDays = totalDays % monthEnd[month]
+    if (totalDays == 0):
+        totalDays = monthEnd[month]
+
+    if totalDays > 31:
+        raise Exception('WRONG NUM DAYS')
     
     # accounts for single digit ints
-    if (day < 10):
-        day = '0' + str(day)
+    if (totalDays < 10):
+        totalDays = '0' + str(day)
     
-    inDate = inDate[:6] + day + inDate[8:]
+    inDate = inDate[:6] + totalDays + inDate[8:]
 
     return inDate
     
