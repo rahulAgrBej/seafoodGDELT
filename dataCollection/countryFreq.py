@@ -25,7 +25,9 @@ MONTH_END = {
 }
 
 COUNTRIES = []
+COUNTRIES_LOCK = threading.Lock()
 
+COUNTRIES_LOCK.acquire()
 # reads in all GDELT supported Countries
 countryFile = open('supportedCountries.txt', 'r')
 numCountries = int(countryFile.readline().rstrip('\n'))
@@ -34,6 +36,7 @@ for cCount in range(numCountries):
     countryData = line.split('\t')
     COUNTRIES.append(countryData)
 countryFile.close()
+COUNTRIES_LOCK.release()
 
 def collectMinutelyNums(inURL, inPayload):
     minuteCount = 0
@@ -136,6 +139,12 @@ COUNTRY_FREQ = {}
 
 PRINT_LOCK = threading.Lock()
 
+def printMulti(strText):
+    PRINT_LOCK.acquire()
+    print(strText)
+    PRINT_LOCK.release()
+    return None
+
 def gdeltRequester():
     
     gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
@@ -151,8 +160,11 @@ def gdeltRequester():
     COUNTRY_LIST_COUNTER += 1
     COUNTRY_LIST_LOCK.release()
 
+    COUNTRIES_LOCK.acquire()
     countryCode = COUNTRIES[countryIdx][0]
     countryName = COUNTRIES[countryIdx][1]
+    COUNTRIES_LOCK.release()
+    printMulti(f'country code: {countryCode}')
 
     COUNTRY_FREQ_LOCK.acquire()
     COUNTRY_FREQ[countryCode] = {}
@@ -167,9 +179,9 @@ def gdeltRequester():
     # Gets maximum allowed number of articles per request
     payload['MAXRECORDS'] = '250'
 
-    # Will just check the month of November 2019
+    # start date Jan 1 2020
     # date format YYYYMMDDHHMMSS
-    dateStart = '20200401000000'
+    dateStart = '20200101000000'
     dateEnd = incrementMonth(dateStart, 1)
 
     # Will only search through articles posted through dateStart-dateEnd
@@ -197,8 +209,12 @@ def gdeltRequester():
         COUNTRY_FREQ[countryCode]['seafood'].append(numSea)
         COUNTRY_FREQ_LOCK.release()
 
+        # update start and end times
         dateStart = dateEnd
         dateEnd = incrementMonth(dateStart, 1)
+
+        payload['STARTDATETIME'] = dateStart
+        payload['ENDDATETIME'] = dateEnd
 
     # writing results to file
     janHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][0]
@@ -225,14 +241,12 @@ def gdeltRequester():
     recordFile.write('\n')
     recordFile.close()
 
-    PRINT_LOCK.acquire()
-    print(f'{countryName} DONE')
-    PRINT_LOCK.release()
+    printMulti(f'{countryName} DONE')
 
     return None
 
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
     COUNTRY_LIST_LOCK.acquire()
     while (COUNTRY_LIST_COUNTER < (100)):
         COUNTRY_LIST_LOCK.release()
@@ -241,5 +255,5 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
 
         COUNTRY_LIST_LOCK.acquire()
     
-    print(COUNTRY_LIST_COUNTER)
+    printMulti(COUNTRY_LIST_COUNTER)
     COUNTRY_LIST_LOCK.release()
