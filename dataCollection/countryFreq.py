@@ -46,7 +46,6 @@ def collectMinutelyNums(inURL, inPayload):
         minuteResults = minuteResp.json()
         if (len(minuteResults.keys()) != 0):
             minuteArticles = len(minuteResults['articles'])
-            print(f'minute {i}: {minuteArticles}')
             minuteCount += minuteArticles
         
         startMin = endMin
@@ -69,7 +68,6 @@ def collectHourlyNums(inURL, inPayload):
             if hourArticles >= MAX_ARTICLES:
                 minuteArticles = collectMinutelyNums(inURL, inPayload)
                 hourArticles = minuteArticles
-            print(f'hour {i}: {hourArticles}')
             hourCount += hourArticles
 
         startHour = endHour
@@ -94,7 +92,6 @@ def collectDailyNums(inURL, inPayload):
             if dailyArticles >= MAX_ARTICLES:
                 hourArticles = collectHourlyNums(inURL, inPayload)
                 dailyArticles = hourArticles
-            print(f'day {i}: {dailyArticles}')
             dailyCount += dailyArticles
         
         startDay = endDay
@@ -107,14 +104,13 @@ def collectMonthNums(inURL, inPayload):
 
     monthlyCount = 0
 
-    monthlyResp = requests.get(gdeltAPI, params=inPayload)
+    monthlyResp = requests.get(inURL, params=inPayload)
     monthlyResults = monthlyResp.json()
     if len(monthlyResults.keys()) != 0:
         monthlyArticles = len(monthlyResults['articles'])
         if monthlyArticles >= MAX_ARTICLES:
             dailyArticles = collectDailyNums(inURL, inPayload)
             monthlyArticles = dailyArticles
-        print(f'month : {monthlyArticles}')
         monthlyCount += monthlyArticles
 
     return monthlyCount
@@ -144,8 +140,13 @@ def gdeltRequester():
     
     gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
 
-    COUNTRY_LIST_LOCK.acquire()
     global COUNTRY_LIST_COUNTER
+    global COUNTRY_FREQ_LOCK
+    global COUNTRY_LIST_LOCK
+    global COUNTRY_FREQ
+    global COUNTRIES
+
+    COUNTRY_LIST_LOCK.acquire()
     countryIdx = COUNTRY_LIST_COUNTER
     COUNTRY_LIST_COUNTER += 1
     COUNTRY_LIST_LOCK.release()
@@ -155,7 +156,7 @@ def gdeltRequester():
 
     COUNTRY_FREQ_LOCK.acquire()
     COUNTRY_FREQ[countryCode] = {}
-    COUNTRY_FREQ[countryCode]['seafood&COVID-19'] = []
+    COUNTRY_FREQ[countryCode]['seafoodCOVID'] = []
     COUNTRY_FREQ[countryCode]['seafood'] = []
     COUNTRY_FREQ_LOCK.release()
 
@@ -176,7 +177,7 @@ def gdeltRequester():
     payload['ENDDATETIME'] = dateEnd
 
     # for JAN 2020 - MAY 2020 (inclusive)
-    for i in range(4):
+    for i in range(5):
 
         # runs search for query with seafood and COVID-19 in it for this particular country
         payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
@@ -214,7 +215,7 @@ def gdeltRequester():
     mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
     seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
     
-    fileName = 'freqData/' + countryCode '.txt'
+    fileName = 'freqData/' + countryCode + '.txt'
     recordFile = open(fileName, 'w')
     recordFile.write(countryName)
     recordFile.write('\n')
@@ -232,12 +233,13 @@ def gdeltRequester():
 
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-    COUNTRY_LIST_LOCK.acquire
+    COUNTRY_LIST_LOCK.acquire()
     while (COUNTRY_LIST_COUNTER < (100)):
         COUNTRY_LIST_LOCK.release()
 
-        executor.submit(gdeltRequester)
+        executor.submit(gdeltRequester())
 
         COUNTRY_LIST_LOCK.acquire()
     
+    print(COUNTRY_LIST_COUNTER)
     COUNTRY_LIST_LOCK.release()
