@@ -43,6 +43,7 @@ COUNTRIES_LOCK.release()
 
 def collectMinutelyNums(inURL, inPayload):
 
+    # otherwise alters payload variable that was passed into it
     inPayload = copy.deepcopy(inPayload)
 
     minuteCount = 0
@@ -70,6 +71,7 @@ def collectMinutelyNums(inURL, inPayload):
 
 def collectHourlyNums(inURL, inPayload):
 
+    # otherwise alters payload variable that was passed into it
     inPayload = copy.deepcopy(inPayload)
 
     hourCount = 0
@@ -99,7 +101,8 @@ def collectHourlyNums(inURL, inPayload):
     return hourCount
 
 def collectDailyNums(inURL, inPayload):
-
+    
+    # otherwise alters payload variable that was passed into it
     inPayload = copy.deepcopy(inPayload)
 
     dailyCount = 0
@@ -132,6 +135,7 @@ def collectDailyNums(inURL, inPayload):
 
 def collectMonthNums(inURL, inPayload):
 
+    # otherwise alters payload variable that was passed into it
     inPayload = copy.deepcopy(inPayload)
 
     monthlyCount = 0
