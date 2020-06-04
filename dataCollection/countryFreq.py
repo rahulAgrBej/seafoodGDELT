@@ -46,7 +46,13 @@ def collectMinutelyNums(inURL, inPayload):
         endMin = incrementMin(startMin, 1)
         inPayload['ENDDATETIME'] = endMin
         minuteResp = requests.get(inURL, inPayload)
-        minuteResults = minuteResp.json()
+        try:
+            minuteResults = minuteResp.json()
+        except:
+            printMulti(minuteResp)
+            printMulti(minuteResp.content)
+            return 0
+        
         if (len(minuteResults.keys()) != 0):
             minuteArticles = len(minuteResults['articles'])
             minuteCount += minuteArticles
@@ -65,7 +71,13 @@ def collectHourlyNums(inURL, inPayload):
         endHour = incrementHour(startHour, 1)
         inPayload['ENDDATETIME'] = endHour
         hourlyResp = requests.get(inURL, inPayload)
-        hourResults = hourlyResp.json()
+        try:
+            hourResults = hourlyResp.json()
+        except:
+            printMulti(hourlyResp)
+            printMulti(hourlyResp.content)
+            return 0
+        
         if (len(hourResults.keys()) != 0):
             hourArticles = len(hourResults['articles'])
             if hourArticles >= MAX_ARTICLES:
@@ -88,7 +100,12 @@ def collectDailyNums(inURL, inPayload):
         endDay = incrementDay(startDay, 1)
         inPayload['ENDDATETIME'] = endDay
         dailyResp = requests.get(inURL, inPayload)
-        dailyResults = dailyResp.json()
+        try:
+            dailyResults = dailyResp.json()
+        except:
+            printMulti(dailyResp)
+            printMulti(dailyResp.content)
+            return 0
 
         if (len(dailyResults.keys()) != 0):
             dailyArticles = len(dailyResults['articles'])
@@ -108,7 +125,13 @@ def collectMonthNums(inURL, inPayload):
     monthlyCount = 0
 
     monthlyResp = requests.get(inURL, params=inPayload)
-    monthlyResults = monthlyResp.json()
+    try:
+        monthlyResults = monthlyResp.json()
+    except:
+        printMulti(monthlyResp)
+        printMulti(monthlyResp.content)
+        return 0
+
     if len(monthlyResults.keys()) != 0:
         monthlyArticles = len(monthlyResults['articles'])
         if monthlyArticles >= MAX_ARTICLES:
@@ -156,7 +179,7 @@ def gdeltRequester():
     global COUNTRIES
 
     COUNTRY_COUNTER_LOCK.acquire()
-    while (COUNTRY_COUNTER < 100):
+    while (COUNTRY_COUNTER < 50):
 
         countryIdx = COUNTRY_COUNTER
         COUNTRY_COUNTER += 1
@@ -253,7 +276,7 @@ def gdeltRequester():
 
 threads = []
 
-for i in range(5):
+for i in range(10):
     threads.append(threading.Thread(target=gdeltRequester, args=()))
     threads[i].start()
 
