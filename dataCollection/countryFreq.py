@@ -131,8 +131,8 @@ plt.legend()
 plt.savefig('dataCollection/sample.png')
 """
 
-COUNTRY_LIST_LOCK = threading.Lock()
-COUNTRY_LIST_COUNTER = 0
+COUNTRY_COUNTER_LOCK = threading.Lock()
+COUNTRY_COUNTER = 0
 
 COUNTRY_FREQ_LOCK = threading.Lock()
 COUNTRY_FREQ = {}
@@ -149,111 +149,113 @@ def gdeltRequester():
     
     gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
 
-    global COUNTRY_LIST_COUNTER
+    global COUNTRY_COUNTER
     global COUNTRY_FREQ_LOCK
-    global COUNTRY_LIST_LOCK
+    global COUNTRY_COUNTER_LOCK
     global COUNTRY_FREQ
     global COUNTRIES
 
-    COUNTRY_LIST_LOCK.acquire()
-    countryIdx = COUNTRY_LIST_COUNTER
-    COUNTRY_LIST_COUNTER += 1
-    COUNTRY_LIST_LOCK.release()
+    COUNTRY_COUNTER_LOCK.acquire()
+    while (COUNTRY_COUNTER < 100):
 
-    COUNTRIES_LOCK.acquire()
-    countryCode = COUNTRIES[countryIdx][0]
-    countryName = COUNTRIES[countryIdx][1]
-    COUNTRIES_LOCK.release()
-    printMulti(f'country code: {countryCode}')
+        countryIdx = COUNTRY_COUNTER
+        COUNTRY_COUNTER += 1
+        COUNTRY_COUNTER_LOCK.release()
 
-    COUNTRY_FREQ_LOCK.acquire()
-    COUNTRY_FREQ[countryCode] = {}
-    COUNTRY_FREQ[countryCode]['seafoodCOVID'] = []
-    COUNTRY_FREQ[countryCode]['seafood'] = []
-    COUNTRY_FREQ_LOCK.release()
+        COUNTRIES_LOCK.acquire()
+        countryCode = COUNTRIES[countryIdx][0]
+        countryName = COUNTRIES[countryIdx][1]
+        COUNTRIES_LOCK.release()
+        printMulti(f'country code: {countryCode}')
 
-    payload = {}
-    payload['MODE'] = 'ArtList'
-    payload['FORMAT'] = 'JSON'
-
-    # Gets maximum allowed number of articles per request
-    payload['MAXRECORDS'] = '250'
-
-    # start date Jan 1 2020
-    # date format YYYYMMDDHHMMSS
-    dateStart = '20200101000000'
-    dateEnd = incrementMonth(dateStart, 1)
-
-    # Will only search through articles posted through dateStart-dateEnd
-    payload['STARTDATETIME'] = dateStart
-    payload['ENDDATETIME'] = dateEnd
-
-    # for JAN 2020 - MAY 2020 (inclusive)
-    for i in range(5):
-
-        # runs search for query with seafood and COVID-19 in it for this particular country
-        payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
-        numSeaCOVID = collectMonthNums(gdeltAPI, payload)
-        
-        # updates COUNTRY_FREQ dictionary with number of article hits
         COUNTRY_FREQ_LOCK.acquire()
-        COUNTRY_FREQ[countryCode]['seafoodCOVID'].append(numSeaCOVID)
+        COUNTRY_FREQ[countryCode] = {}
+        COUNTRY_FREQ[countryCode]['seafoodCOVID'] = []
+        COUNTRY_FREQ[countryCode]['seafood'] = []
         COUNTRY_FREQ_LOCK.release()
 
-        # runs search for query with seafood in it for this particular country
-        payload['QUERY'] = 'seafood sourcecountry:' + countryCode
-        numSea = collectMonthNums(gdeltAPI, payload)
+        payload = {}
+        payload['MODE'] = 'ArtList'
+        payload['FORMAT'] = 'JSON'
 
-        # updates COUNTRY_FREQ dictionary with number of article hits
-        COUNTRY_FREQ_LOCK.acquire()
-        COUNTRY_FREQ[countryCode]['seafood'].append(numSea)
-        COUNTRY_FREQ_LOCK.release()
+        # Gets maximum allowed number of articles per request
+        payload['MAXRECORDS'] = '250'
 
-        # update start and end times
-        dateStart = dateEnd
+        # start date Jan 1 2020
+        # date format YYYYMMDDHHMMSS
+        dateStart = '20200101000000'
         dateEnd = incrementMonth(dateStart, 1)
 
+        # Will only search through articles posted through dateStart-dateEnd
         payload['STARTDATETIME'] = dateStart
         payload['ENDDATETIME'] = dateEnd
 
-    # writing results to file
-    janHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][0]
-    febHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][1]
-    marchHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][2]
-    aprilHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][3]
-    mayHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][4]
-    seaCOVIDHits = f'{janHits} {febHits} {marchHits} {aprilHits} {mayHits}'
+        # for JAN 2020 - MAY 2020 (inclusive)
+        for i in range(5):
 
-    janHitSea = COUNTRY_FREQ[countryCode]["seafood"][0]
-    febHitSea = COUNTRY_FREQ[countryCode]["seafood"][1]
-    marchHitSea = COUNTRY_FREQ[countryCode]["seafood"][2]
-    aprilHitSea = COUNTRY_FREQ[countryCode]["seafood"][3]
-    mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
-    seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
-    
-    fileName = 'freqData/' + countryCode + '.txt'
-    recordFile = open(fileName, 'w')
-    recordFile.write(countryName)
-    recordFile.write('\n')
-    recordFile.write('seafood AND COVID-19: ' + seaCOVIDHits)
-    recordFile.write('\n')
-    recordFile.write('seafood: ' +seaHits)
-    recordFile.write('\n')
-    recordFile.close()
+            # runs search for query with seafood and COVID-19 in it for this particular country
+            payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
+            numSeaCOVID = collectMonthNums(gdeltAPI, payload)
+            
+            # updates COUNTRY_FREQ dictionary with number of article hits
+            COUNTRY_FREQ_LOCK.acquire()
+            COUNTRY_FREQ[countryCode]['seafoodCOVID'].append(numSeaCOVID)
+            COUNTRY_FREQ_LOCK.release()
 
-    printMulti(f'{countryName} DONE')
+            # runs search for query with seafood in it for this particular country
+            payload['QUERY'] = 'seafood sourcecountry:' + countryCode
+            numSea = collectMonthNums(gdeltAPI, payload)
 
+            # updates COUNTRY_FREQ dictionary with number of article hits
+            COUNTRY_FREQ_LOCK.acquire()
+            COUNTRY_FREQ[countryCode]['seafood'].append(numSea)
+            COUNTRY_FREQ_LOCK.release()
+
+            # update start and end times
+            dateStart = dateEnd
+            dateEnd = incrementMonth(dateStart, 1)
+
+            payload['STARTDATETIME'] = dateStart
+            payload['ENDDATETIME'] = dateEnd
+
+        # writing results to file
+        janHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][0]
+        febHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][1]
+        marchHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][2]
+        aprilHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][3]
+        mayHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][4]
+        seaCOVIDHits = f'{janHits} {febHits} {marchHits} {aprilHits} {mayHits}'
+
+        janHitSea = COUNTRY_FREQ[countryCode]["seafood"][0]
+        febHitSea = COUNTRY_FREQ[countryCode]["seafood"][1]
+        marchHitSea = COUNTRY_FREQ[countryCode]["seafood"][2]
+        aprilHitSea = COUNTRY_FREQ[countryCode]["seafood"][3]
+        mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
+        seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
+        
+        fileName = 'freqData/' + countryCode + '.txt'
+        recordFile = open(fileName, 'w')
+        recordFile.write(countryName)
+        recordFile.write('\n')
+        recordFile.write('seafood AND COVID-19: ' + seaCOVIDHits)
+        recordFile.write('\n')
+        recordFile.write('seafood: ' +seaHits)
+        recordFile.write('\n')
+        recordFile.close()
+
+        printMulti(f'{countryName} DONE')
+        
+        COUNTRY_COUNTER_LOCK.acquire()
+
+    COUNTRY_COUNTER_LOCK.release()
     return None
 
 
-with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-    COUNTRY_LIST_LOCK.acquire()
-    while (COUNTRY_LIST_COUNTER < (100)):
-        COUNTRY_LIST_LOCK.release()
+threads = []
 
-        executor.submit(gdeltRequester())
+for i in range(5):
+    threads.append(threading.Thread(target=gdeltRequester, args=()))
+    threads[i].start()
 
-        COUNTRY_LIST_LOCK.acquire()
-    
-    printMulti(COUNTRY_LIST_COUNTER)
-    COUNTRY_LIST_LOCK.release()
+for i in range(10):
+    threads[i].join()
