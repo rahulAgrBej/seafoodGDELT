@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import threading
 from changeDateParams import getMonth, incrementMin, incrementHour, incrementDay, incrementMonth, incrementYear
 import concurrent.futures
+import copy
 
 
 MAX_ARTICLES = 250
@@ -36,9 +37,14 @@ for cCount in range(numCountries):
     countryData = line.split('\t')
     COUNTRIES.append(countryData)
 countryFile.close()
+
+COUNTRIES = [['CA', 'Canada']]
 COUNTRIES_LOCK.release()
 
 def collectMinutelyNums(inURL, inPayload):
+
+    inPayload = copy.deepcopy(inPayload)
+
     minuteCount = 0
 
     startMin = inPayload['STARTDATETIME']
@@ -50,7 +56,7 @@ def collectMinutelyNums(inURL, inPayload):
             minuteResults = minuteResp.json()
         except:
             printMulti(minuteResp)
-            printMulti(minuteResp.content)
+            printMulti(f'minute {minuteResp.content} {inPayload["STARTDATETIME"]} {inPayload["ENDDATETIME"]}')
             return 0
         
         if (len(minuteResults.keys()) != 0):
@@ -64,6 +70,8 @@ def collectMinutelyNums(inURL, inPayload):
 
 def collectHourlyNums(inURL, inPayload):
 
+    inPayload = copy.deepcopy(inPayload)
+
     hourCount = 0
 
     startHour = inPayload['STARTDATETIME']
@@ -75,7 +83,7 @@ def collectHourlyNums(inURL, inPayload):
             hourResults = hourlyResp.json()
         except:
             printMulti(hourlyResp)
-            printMulti(hourlyResp.content)
+            printMulti(f'hour {hourlyResp.content} {inPayload["STARTDATETIME"]} {inPayload["ENDDATETIME"]}')
             return 0
         
         if (len(hourResults.keys()) != 0):
@@ -92,6 +100,8 @@ def collectHourlyNums(inURL, inPayload):
 
 def collectDailyNums(inURL, inPayload):
 
+    inPayload = copy.deepcopy(inPayload)
+
     dailyCount = 0
     
     startDay = inPayload['STARTDATETIME']
@@ -104,7 +114,7 @@ def collectDailyNums(inURL, inPayload):
             dailyResults = dailyResp.json()
         except:
             printMulti(dailyResp)
-            printMulti(dailyResp.content)
+            printMulti(f'day {dailyResp.content} {inPayload["STARTDATETIME"]} {inPayload["ENDDATETIME"]}')
             return 0
 
         if (len(dailyResults.keys()) != 0):
@@ -122,6 +132,8 @@ def collectDailyNums(inURL, inPayload):
 
 def collectMonthNums(inURL, inPayload):
 
+    inPayload = copy.deepcopy(inPayload)
+
     monthlyCount = 0
 
     monthlyResp = requests.get(inURL, params=inPayload)
@@ -129,7 +141,7 @@ def collectMonthNums(inURL, inPayload):
         monthlyResults = monthlyResp.json()
     except:
         printMulti(monthlyResp)
-        printMulti(monthlyResp.content)
+        printMulti(f'month {monthlyResp.content} {inPayload["STARTDATETIME"]} {inPayload["ENDDATETIME"]}')
         return 0
 
     if len(monthlyResults.keys()) != 0:
@@ -179,7 +191,7 @@ def gdeltRequester():
     global COUNTRIES
 
     COUNTRY_COUNTER_LOCK.acquire()
-    while (COUNTRY_COUNTER < 50):
+    while (COUNTRY_COUNTER < 1):
 
         countryIdx = COUNTRY_COUNTER
         COUNTRY_COUNTER += 1
@@ -217,6 +229,7 @@ def gdeltRequester():
         for i in range(5):
 
             # runs search for query with seafood and COVID-19 in it for this particular country
+            printMulti(f"before seaCOVID {payload['STARTDATETIME']} {payload['ENDDATETIME']}")
             payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
             numSeaCOVID = collectMonthNums(gdeltAPI, payload)
             
@@ -227,6 +240,7 @@ def gdeltRequester():
 
             # runs search for query with seafood in it for this particular country
             payload['QUERY'] = 'seafood sourcecountry:' + countryCode
+            printMulti(f"before SEA {payload['STARTDATETIME']} {payload['ENDDATETIME']}")
             numSea = collectMonthNums(gdeltAPI, payload)
 
             # updates COUNTRY_FREQ dictionary with number of article hits
