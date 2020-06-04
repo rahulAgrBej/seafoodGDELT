@@ -136,7 +136,8 @@ def collectMonthNums(inURL, inPayload):
     monthlyResp = requests.get(inURL, params=inPayload)
     try:
         monthlyResults = monthlyResp.json()
-    return 0
+    except:
+        return 0
 
     if len(monthlyResults.keys()) != 0:
         monthlyArticles = len(monthlyResults['items'])
