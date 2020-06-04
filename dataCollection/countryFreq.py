@@ -3,6 +3,7 @@ import requests
 import json
 import pprint
 import matplotlib.pyplot as plt
+import threading
 from changeDateParams import getMonth, incrementMin, incrementHour, incrementDay, incrementMonth, incrementYear
 
 MAX_ARTICLES = 250
@@ -115,71 +116,7 @@ def collectMonthNums(inURL, inPayload):
         monthlyCount += monthlyArticles
 
     return monthlyCount
-        
 
-gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
-
-payload = {}
-payload['MODE'] = 'ArtList'
-payload['FORMAT'] = 'JSON'
-
-# Gets maximum allowed number of articles per request
-payload['MAXRECORDS'] = '250'
-
-# Will just check the month of November 2019
-# date format YYYYMMDDHHMMSS
-dateStart = '20200301000000'
-dateEnd = incrementMonth(dateStart, 1)
-
-# Will only search through articles posted through dateStart-dateEnd
-payload['STARTDATETIME'] = dateStart
-payload['ENDDATETIME'] = dateEnd
-
-# Gets a list of all countries in the world
-#countriesList = list(pycountry.countries)
-#countryList = ['GH', 'TH', 'NO', 'VM', 'CI']
-
-countryFreq = {}
-"""
-for country in countryList:
-    countryFreq[country] = []
-"""
-payload['QUERY'] = 'seafood "COVID-19" sourcecountry:US'
-numUSA = collectMonthNums(gdeltAPI, payload)
-print(numUSA)
-"""
-# make GDELT requests for each country in our list of countries from Jan 2020 - May 2020
-for i in range(5):
-    
-    for countryIdx in range(len(COUNTRIES))[:5]:
-        
-        countryCode = COUNTRIES[countryIdx][0]
-        countryName = COUNTRIES[countryIdx][1]
-        payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
-        numSeaCOVID = collectMonthNums(gdeltAPI, payload)
-
-        # if its the first time we are getting data for this country
-        if not (countryName in countryFreq.keys()):
-            countryFreq[countryName] = {}
-            countryFreq[countryName]['seafood&COVID-19'] = []
-            countryFreq[countryName]['seafood'] = []
-            countryFreq[countryName]['percent'] = []
-            
-        
-        countryFreq[countryName]['seafood&COVID-19'].append(numSeaCOVID)
-        
-        payload['QUERY'] = 'seafood sourcecountry:' + countryCode
-        numSea = collectMonthNums(gdeltAPI, payload)
-        
-        countryFreq[countryName]['seafood'].append(numSea)
-
-        countryFreq[countryName][percent] = (numSeaCOVID / numSea) * 100
-    
-    payload['STARTDATETIME'] = payload['ENDDATETIME']
-    payload['ENDDATETIME'] = incrementMonth(payload['ENDDATETIME'], 1)
-    print(countryFreq)
-    print()
-"""
 """
 monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
 
@@ -192,3 +129,103 @@ plt.legend()
 
 plt.savefig('dataCollection/sample.png')
 """
+
+COUNTRY_LIST_LOCK = threading.Lock()
+COUNTRY_LIST_COUNTER = 0
+
+COUNTRY_FREQ_LOCK = threading.Lock()
+COUNTRY_FREQ = {}
+
+PRINT_LOCK = threading.Lock()
+
+def gdeltRequester():
+    
+    gdeltAPI = 'https://api.gdeltproject.org/api/v2/doc/doc'
+
+    COUNTRY_LIST_LOCK.acquire()
+    global COUNTRY_LIST_COUNTER
+    countryIdx = COUNTRY_LIST_COUNTER
+    COUNTRY_LIST_COUNTER += 1
+    COUNTRY_LIST_LOCK.release()
+
+    countryCode = COUNTRIES[countryIdx][0]
+    countryName = COUNTRIES[countryIdx][1]
+
+    COUNTRY_FREQ_LOCK.acquire()
+    COUNTRY_FREQ[countryCode] = {}
+    COUNTRY_FREQ[countryCode]['seafood&COVID-19'] = []
+    COUNTRY_FREQ[countryCode]['seafood'] = []
+    COUNTRY_FREQ_LOCK.release()
+
+    payload = {}
+    payload['MODE'] = 'ArtList'
+    payload['FORMAT'] = 'JSON'
+
+    # Gets maximum allowed number of articles per request
+    payload['MAXRECORDS'] = '250'
+
+    # Will just check the month of November 2019
+    # date format YYYYMMDDHHMMSS
+    dateStart = '20200401000000'
+    dateEnd = incrementMonth(dateStart, 1)
+
+    # Will only search through articles posted through dateStart-dateEnd
+    payload['STARTDATETIME'] = dateStart
+    payload['ENDDATETIME'] = dateEnd
+
+    # for JAN 2020 - MAY 2020 (inclusive)
+    for i in range(4):
+
+        # runs search for query with seafood and COVID-19 in it for this particular country
+        payload['QUERY'] = 'seafood "COVID-19" sourcecountry:' + countryCode
+        numSeaCOVID = collectMonthNums(gdeltAPI, payload)
+        
+        # updates COUNTRY_FREQ dictionary with number of article hits
+        COUNTRY_FREQ_LOCK.acquire()
+        COUNTRY_FREQ[countryCode]['seafoodCOVID'].append(numSeaCOVID)
+        COUNTRY_FREQ_LOCK.release()
+
+        # runs search for query with seafood in it for this particular country
+        payload['QUERY'] = 'seafood sourcecountry:' + countryCode
+        numSea = collectMonthNums(gdeltAPI, payload)
+
+        # updates COUNTRY_FREQ dictionary with number of article hits
+        COUNTRY_FREQ_LOCK.acquire()
+        COUNTRY_FREQ[countryCode]['seafood'].append(numSea)
+        COUNTRY_FREQ_LOCK.release()
+
+        dateStart = dateEnd
+        dateEnd = incrementMonth(dateStart, 1)
+
+    # writing results to file
+    janHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][0]
+    febHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][1]
+    marchHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][2]
+    aprilHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][3]
+    mayHits = COUNTRY_FREQ[countryCode]["seafoodCOVID"][4]
+    seaCOVIDHits = f'{janHits} {febHits} {marchHits} {aprilHits} {mayHits}'
+
+    janHitSea = COUNTRY_FREQ[countryCode]["seafood"][0]
+    febHitSea = COUNTRY_FREQ[countryCode]["seafood"][1]
+    marchHitSea = COUNTRY_FREQ[countryCode]["seafood"][2]
+    aprilHitSea = COUNTRY_FREQ[countryCode]["seafood"][3]
+    mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
+    seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
+    
+    fileName = 'record' + countryCode
+    recordFile = open('fileName', 'w')
+    recordFile.write(countryName)
+    recordFile.write('\n')
+    recordFile.write('seafood AND COVID-19: ' + seaCOVIDHits)
+    recordFile.write('\n')
+    recordFile.write('seafood: ' +seaHits)
+    recordFile.write('\n')
+    recordFile.close()
+
+    PRINT_LOCK.acquire()
+    print(f'{countryName} DONE')
+    PRINT_LOCK.release
+
+    return None
+
+
