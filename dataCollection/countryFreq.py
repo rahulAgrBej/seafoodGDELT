@@ -5,6 +5,8 @@ import pprint
 import matplotlib.pyplot as plt
 import threading
 from changeDateParams import getMonth, incrementMin, incrementHour, incrementDay, incrementMonth, incrementYear
+import concurrent.futures
+
 
 MAX_ARTICLES = 250
 MONTH_END = {
@@ -212,8 +214,8 @@ def gdeltRequester():
     mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
     seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
     
-    fileName = 'record' + countryCode
-    recordFile = open('fileName', 'w')
+    fileName = 'freqData/' + countryCode '.txt'
+    recordFile = open(fileName, 'w')
     recordFile.write(countryName)
     recordFile.write('\n')
     recordFile.write('seafood AND COVID-19: ' + seaCOVIDHits)
@@ -224,8 +226,18 @@ def gdeltRequester():
 
     PRINT_LOCK.acquire()
     print(f'{countryName} DONE')
-    PRINT_LOCK.release
+    PRINT_LOCK.release()
 
     return None
 
 
+with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    COUNTRY_LIST_LOCK.acquire
+    while (COUNTRY_LIST_COUNTER < (100)):
+        COUNTRY_LIST_LOCK.release()
+
+        executor.submit(gdeltRequester)
+
+        COUNTRY_LIST_LOCK.acquire()
+    
+    COUNTRY_LIST_LOCK.release()
