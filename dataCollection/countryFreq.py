@@ -160,19 +160,6 @@ def collectMonthNums(inURL, inPayload):
 
     return monthlyCount
 
-"""
-monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
-
-
-countryScatters = []
-for country in countryList:
-    countryScatters.append(plt.plot(monthNames, countryFreq[country], label=country)) 
-
-plt.legend()
-
-plt.savefig('dataCollection/sample.png')
-"""
-
 COUNTRY_COUNTER_LOCK = threading.Lock()
 COUNTRY_COUNTER = 0
 
@@ -208,7 +195,7 @@ def gdeltRequester():
         countryCode = COUNTRIES[countryIdx][0]
         countryName = COUNTRIES[countryIdx][1]
         COUNTRIES_LOCK.release()
-        printMulti(f'country code: {countryCode}')
+        printMulti(f'START: {countryName}')
 
         COUNTRY_FREQ_LOCK.acquire()
         COUNTRY_FREQ[countryCode] = {}
@@ -285,7 +272,7 @@ def gdeltRequester():
         recordFile.write('\n')
         recordFile.close()
 
-        printMulti(f'{countryName} DONE')
+        printMulti(f'DONE {countryName}')
         
         COUNTRY_COUNTER_LOCK.acquire()
 
@@ -295,9 +282,9 @@ def gdeltRequester():
 
 threads = []
 
-for i in range(1):
+for i in range(10):
     threads.append(threading.Thread(target=gdeltRequester, args=()))
     threads[i].start()
 
-for i in range(1):
+for i in range(10):
     threads[i].join()
