@@ -259,7 +259,7 @@ def gdeltRequester():
         mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
         seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
         
-        fileName = '../testing/' + countryCode + '.txt'
+        fileName = 'freqData/' + countryCode + '.txt'
         recordFile = open(fileName, 'w')
         recordFile.write(countryName)
         recordFile.write('\n')
