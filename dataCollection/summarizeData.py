@@ -40,19 +40,6 @@ def plotPercents(folderName):
     return countryPercents
 
 
-"""
-monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
-
-
-countryScatters = []
-for country in countryList:
-    countryScatters.append(plt.plot(monthNames, countryFreq[country], label=country)) 
-
-plt.legend()
-
-plt.savefig('dataCollection/sample.png')
-"""
-
 percentData = plotPercents('freqData')
 monthNames = ['Jan', 'Feb', 'March', 'April', 'May']
 countryScatters = []
