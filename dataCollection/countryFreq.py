@@ -32,8 +32,8 @@ COUNTRIES_LOCK = threading.Lock()
 COUNTRIES_LOCK.acquire()
 # reads in all GDELT supported Countries
 countryFile = open('supportedCountries.txt', 'r')
-numCountries = int(countryFile.readline().rstrip('\n'))
-for cCount in range(numCountries):
+NUM_COUNTRIES = int(countryFile.readline().rstrip('\n'))
+for cCount in range(NUM_COUNTRIES):
     line = countryFile.readline().rstrip('\n')
     countryData = line.split('\t')
     COUNTRIES.append(countryData)
@@ -120,9 +120,6 @@ def collectDailyNums(inURL, inPayload):
         except json.decoder.JSONDecodeError:
             firstStrip = re.sub('\\\\', '', dailyResp.text)
             correctStr = STRIPPED(firstStrip)
-            file = open('testingCHINABRUH222222.txt', 'w')
-            file.write(correctStr)
-            file.close()
             dailyResults = json.loads(correctStr)
 
         if (len(dailyResults.keys()) != 0):
@@ -150,9 +147,8 @@ def collectMonthNums(inURL, inPayload):
     try:
         monthlyResults = monthlyResp.json()
     except json.decoder.JSONDecodeError:
-        global MPA
-        correctStr = re.sub('\\\\', '', monthlyResp.text)
-        correctStr = correctStr.translate(MPA)
+        firstStrip= re.sub('\\\\', '', monthlyResp.text)
+        correctStr = STRIPPED(firstStrip)
         monthlyResults = json.loads(correctStr)
 
     if len(monthlyResults.keys()) != 0:
@@ -202,7 +198,7 @@ def gdeltRequester():
     global COUNTRIES
 
     COUNTRY_COUNTER_LOCK.acquire()
-    while (COUNTRY_COUNTER < 1):
+    while (COUNTRY_COUNTER < NUM_COUNTRIES):
 
         countryIdx = COUNTRY_COUNTER
         COUNTRY_COUNTER += 1
