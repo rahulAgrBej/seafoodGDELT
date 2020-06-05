@@ -112,7 +112,6 @@ def collectDailyNums(inURL, inPayload):
         endDay = incrementDay(startDay, 1)
         inPayload['ENDDATETIME'] = endDay
         dailyResp = requests.get(inURL, inPayload)
-        printMulti(f'day {dailyResp}')
         try:
             dailyResults = dailyResp.json()
         except json.decoder.JSONDecodeError:
@@ -141,7 +140,6 @@ def collectMonthNums(inURL, inPayload):
     monthlyCount = 0
 
     monthlyResp = requests.get(inURL, params=inPayload)
-    printMulti(f'month {monthlyResp}')
     try:
         monthlyResults = monthlyResp.json()
     except json.decoder.JSONDecodeError:
