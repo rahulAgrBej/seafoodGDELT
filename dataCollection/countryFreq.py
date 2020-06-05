@@ -38,8 +38,6 @@ for cCount in range(NUM_COUNTRIES):
     countryData = line.split('\t')
     COUNTRIES.append(countryData)
 countryFile.close()
-
-COUNTRIES = [['CH', 'China']]
 COUNTRIES_LOCK.release()
 
 def collectMinutelyNums(inURL, inPayload):
