@@ -60,7 +60,7 @@ def collectMinutelyNums(inURL, inPayload):
             minuteResults = json.loads(correctStr)
         
         if (len(minuteResults.keys()) != 0):
-            minuteArticles = len(minuteResults['items'])
+            minuteArticles = len(minuteResults['articles'])
             minuteCount += minuteArticles
         
         startMin = endMin
@@ -88,7 +88,7 @@ def collectHourlyNums(inURL, inPayload):
             hourlyResults = json.loads(correctStr)
         
         if (len(hourlyResults.keys()) != 0):
-            hourArticles = len(hourlyResults['items'])
+            hourArticles = len(hourlyResults['articles'])
             if hourArticles >= MAX_ARTICLES:
                 minuteArticles = collectMinutelyNums(inURL, inPayload)
                 hourArticles = minuteArticles
@@ -108,6 +108,7 @@ def collectDailyNums(inURL, inPayload):
     
     startDay = inPayload['STARTDATETIME']
     month = int(getMonth(startDay))
+
     for i in range (MONTH_END[month]):
         endDay = incrementDay(startDay, 1)
         inPayload['ENDDATETIME'] = endDay
@@ -120,7 +121,7 @@ def collectDailyNums(inURL, inPayload):
             dailyResults = json.loads(correctStr)
 
         if (len(dailyResults.keys()) != 0):
-            dailyArticles = len(dailyResults['items'])
+            dailyArticles = len(dailyResults['articles'])
             if dailyArticles >= MAX_ARTICLES:
                 hourArticles = collectHourlyNums(inURL, inPayload)
                 dailyArticles = hourArticles
@@ -148,7 +149,7 @@ def collectMonthNums(inURL, inPayload):
         monthlyResults = json.loads(correctStr)
 
     if len(monthlyResults.keys()) != 0:
-        monthlyArticles = len(monthlyResults['items'])
+        monthlyArticles = len(monthlyResults['articles'])
         if monthlyArticles >= MAX_ARTICLES:
             dailyArticles = collectDailyNums(inURL, inPayload)
             monthlyArticles = dailyArticles
@@ -201,7 +202,7 @@ def gdeltRequester():
 
         payload = {}
         payload['MODE'] = 'ArtList'
-        payload['FORMAT'] = 'JSONFeed'
+        payload['FORMAT'] = 'JSON'
 
         # Gets maximum allowed number of articles per request
         payload['MAXRECORDS'] = '250'
@@ -258,7 +259,7 @@ def gdeltRequester():
         mayHitSea = COUNTRY_FREQ[countryCode]["seafood"][4]
         seaHits = f'{janHitSea} {febHitSea} {marchHitSea} {aprilHitSea} {mayHitSea}'
         
-        fileName = 'freqData/' + countryCode + '.txt'
+        fileName = '../testing/' + countryCode + '.txt'
         recordFile = open(fileName, 'w')
         recordFile.write(countryName)
         recordFile.write('\n')
