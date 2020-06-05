@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import threading
 from changeDateParams import getMonth, incrementMin, incrementHour, incrementDay, incrementMonth, incrementYear
 import copy
+import re
 
+
+STRIPPED = lambda s: "".join(i for i in s if 31 < ord(i) < 127)
 
 MAX_ARTICLES = 250
 MONTH_END = {
@@ -36,6 +39,7 @@ for cCount in range(numCountries):
     COUNTRIES.append(countryData)
 countryFile.close()
 
+COUNTRIES = [['CH', 'China']]
 COUNTRIES_LOCK.release()
 
 def collectMinutelyNums(inURL, inPayload):
@@ -50,12 +54,12 @@ def collectMinutelyNums(inURL, inPayload):
         endMin = incrementMin(startMin, 1)
         inPayload['ENDDATETIME'] = endMin
         minuteResp = requests.get(inURL, inPayload)
-
-        minuteContent = minuteResp.content.decode(minuteResp.encoding)
         try:
-            minuteResults = json.loads(minuteContent)
-        except:
-            return 0
+            minuteResults = minuteresp.json()
+        except json.decoder.JSONDecodeError:
+            firstStrip = re.sub('\\\\', '', minuteResp.text)
+            correctStr = STRIPPED(firstStrip)
+            minuteResults = json.loads(correctStr)
         
         if (len(minuteResults.keys()) != 0):
             minuteArticles = len(minuteResults['items'])
@@ -80,8 +84,10 @@ def collectHourlyNums(inURL, inPayload):
         hourlyResp = requests.get(inURL, inPayload)
         try:
             hourlyResults = hourlyResp.json()
-        except:
-            return 0
+        except json.decoder.JSONDecodeError:
+            firstStrip = re.sub('\\\\', '', hourlyResp.text)
+            correctStr = STRIPPED(firstStrip)
+            hourlyResults = json.loads(correctStr)
         
         if (len(hourlyResults.keys()) != 0):
             hourArticles = len(hourlyResults['items'])
@@ -108,10 +114,16 @@ def collectDailyNums(inURL, inPayload):
         endDay = incrementDay(startDay, 1)
         inPayload['ENDDATETIME'] = endDay
         dailyResp = requests.get(inURL, inPayload)
+        printMulti(f'day {dailyResp}')
         try:
             dailyResults = dailyResp.json()
-        except:
-            return 0
+        except json.decoder.JSONDecodeError:
+            firstStrip = re.sub('\\\\', '', dailyResp.text)
+            correctStr = STRIPPED(firstStrip)
+            file = open('testingCHINABRUH222222.txt', 'w')
+            file.write(correctStr)
+            file.close()
+            dailyResults = json.loads(correctStr)
 
         if (len(dailyResults.keys()) != 0):
             dailyArticles = len(dailyResults['items'])
@@ -134,10 +146,14 @@ def collectMonthNums(inURL, inPayload):
     monthlyCount = 0
 
     monthlyResp = requests.get(inURL, params=inPayload)
+    printMulti(f'month {monthlyResp}')
     try:
         monthlyResults = monthlyResp.json()
-    except:
-        return 0
+    except json.decoder.JSONDecodeError:
+        global MPA
+        correctStr = re.sub('\\\\', '', monthlyResp.text)
+        correctStr = correctStr.translate(MPA)
+        monthlyResults = json.loads(correctStr)
 
     if len(monthlyResults.keys()) != 0:
         monthlyArticles = len(monthlyResults['items'])
@@ -186,7 +202,7 @@ def gdeltRequester():
     global COUNTRIES
 
     COUNTRY_COUNTER_LOCK.acquire()
-    while (COUNTRY_COUNTER < 274):
+    while (COUNTRY_COUNTER < 1):
 
         countryIdx = COUNTRY_COUNTER
         COUNTRY_COUNTER += 1
@@ -283,9 +299,9 @@ def gdeltRequester():
 
 threads = []
 
-for i in range(10):
+for i in range(1):
     threads.append(threading.Thread(target=gdeltRequester, args=()))
     threads[i].start()
 
-for i in range(10):
+for i in range(1):
     threads[i].join()
