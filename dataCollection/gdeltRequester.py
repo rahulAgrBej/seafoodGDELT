@@ -47,6 +47,7 @@ COUNTRIES = [['CA', 'Canada']]
 COUNTRIES_LOCK.release()
 
 REQ_QUEUE = queue.Queue()
+REQ_QUEUE_CV = threading.Condition()
 
 # builds more granular searches and puts them on REQ_QUEUE
 def granularSearch(inList):
@@ -91,7 +92,11 @@ def granularSearch(inList):
         newReqList[4] = end
         newReqList[6] = newSearchRate
 
+        # add new granular search to request queue
+        REQ_QUEUE_CV.acquire()
         REQ_QUEUE.put(newReqList)
+        REQ_QUEUE_CV.notifyAll()
+        REQ_QUEUE_CV.release()
 
         start = end
 
@@ -137,6 +142,18 @@ def makeReq(inList):
                 granularSearch(inList, 'minute')
 
     return None
+
+# takes requests off of the queue and calls to execute the request
+def reqConsumer():
+
+    REQ_QUEUE_CV.acquire()
+    while REQ_QUEUE.empty():
+        REQ_QUEUE_CV.wait()
+        
+    newReq = REQ_QUEUE.get()
+    REQ_QUEUE_CV.release()
+
+    makeReq(newReq)
 
 
 # ==================================================================================================
