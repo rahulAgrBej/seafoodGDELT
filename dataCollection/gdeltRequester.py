@@ -44,7 +44,7 @@ for cCount in range(NUM_COUNTRIES):
 countryFile.close()
 
 # TEST EXAMPLE
-COUNTRIES = [['US', 'United States']]
+#COUNTRIES = [['US', 'United States']]
 COUNTRIES_LOCK.release()
 
 REQ_QUEUE = queue.Queue()
@@ -52,7 +52,6 @@ REQ_QUEUE_LOCK = threading.Lock()
 
 # builds more granular searches and puts them on REQ_QUEUE
 def granularSearch(inList):
-    print('granular here')
 
     # collect start time
     start = inList[3]
@@ -76,7 +75,7 @@ def granularSearch(inList):
 
     elif searchRate == 'hourly':
         # make minute by minute requests
-        loopEnd = 60
+        loopEnd = 2
         newSearchRate = 'minute'
     
 
@@ -86,7 +85,7 @@ def granularSearch(inList):
         elif searchRate == 'daily':
             end = cdp.incrementHour(start, 1)
         elif searchRate == 'hourly':
-            end = cdp.incrementMin(start, 1)
+            end = cdp.incrementMin(start, 30)
         
         # creating new list for more granular search
         newReqList = copy.deepcopy(inList)
@@ -96,7 +95,6 @@ def granularSearch(inList):
 
         # add new granular search to request queue
         REQ_QUEUE_LOCK.acquire()
-        print('putting somethign on the REQ_QUEUE')
         REQ_QUEUE.put(newReqList)
         REQ_QUEUE_LOCK.release()
 
@@ -106,7 +104,6 @@ def granularSearch(inList):
 # builds and sends the request from the variables in the REQ_QUEUE
 # if the MAX_RESULTS are found put more granular searches in the REQ_QUEUE
 def makeReq(inList):
-    print(f'MAKE {inList}')
     # builds payload of parameters of query
     payload = {}
     payload['MODE'] = inList[0]
@@ -127,15 +124,21 @@ def makeReq(inList):
     except json.decoder.JSONDecodeError:
         firstStrip = re.sub('\\\\', '', resp.text)
         correctStr = STRIPPED(firstStrip)
-        print('exception handling')
-        results = json.loads(correctStr)
+        try:
+            results = json.loads(correctStr)
+        except:
+            print('exception handling')
+            print(correctStr)
+            print(f'start {inList[3]}')
+            print(f'end {inList[4]}')
+            return None
 
     # checks to see if more granular searches are necessary or if results can be recorded
     if (len(results.keys()) > 0):
         articles = len(results['articles'])
         if articles < MAX_ARTICLES:
             # do something with articles results
-            print(f'num articles found {articles}')
+            print(f'FOUND {articles} {inList}')
         else:
             granularSearch(inList)
     return None
@@ -145,7 +148,6 @@ def reqConsumer():
 
     REQ_QUEUE_LOCK.acquire()
     
-    print('getting something from the REQ_QUEUE')
     if not REQ_QUEUE.empty():
         newReq = REQ_QUEUE.get()
         REQ_QUEUE_LOCK.release()
@@ -175,38 +177,32 @@ def mainRequester():
 # ==================================================================================================
 # SHOW CASE EXAMPLE
 
-
-COUNTRIES_LOCK.acquire()
-countryCode = COUNTRIES[0][0]
-countryName = COUNTRIES[0][1]
-COUNTRIES_LOCK.release()
-
-reqMode = 'ArtList'
-reqFormat = 'JSON'
-articleCount = MAX_ARTICLES
-startTime = '20200101000000'
-endTime = '20200201000000'
-reqQuery = 'seafood sourcecountry:' + countryCode
-searchRate = 'monthly'
-
-reqList = []
-reqList.append(reqMode)
-reqList.append(reqFormat)
-reqList.append(articleCount)
-reqList.append(startTime)
-reqList.append(endTime)
-reqList.append(reqQuery)
-reqList.append(searchRate)
-
 REQ_QUEUE_LOCK.acquire()
-REQ_QUEUE.put(reqList)
+
+for country in COUNTRIES:
+    countryCode = country[0]
+    countryName = country[1]
+    startTime = '20200101000000'
+    for i in range(5):
+        reqMode = 'ArtList'
+        reqFormat = 'JSON'
+        articleCount = MAX_ARTICLES
+        
+        endTime = cdp.incrementMonth(startTime, 1)
+        reqQuery = 'seafood sourcecountry:' + countryCode
+        searchRate = 'monthly'
+
+        reqList = []
+        reqList.append(reqMode)
+        reqList.append(reqFormat)
+        reqList.append(articleCount)
+        reqList.append(startTime)
+        reqList.append(endTime)
+        reqList.append(reqQuery)
+        reqList.append(searchRate)
+        REQ_QUEUE.put(reqList)
+
+        startTime = endTime
 REQ_QUEUE_LOCK.release()
 
 mainRequester()
-
-REQ_QUEUE_LOCK.acquire()
-print(REQ_QUEUE.qsize())
-print()
-while not REQ_QUEUE.empty():
-    print(REQ_QUEUE.get())
-REQ_QUEUE_LOCK.release()
