@@ -94,7 +94,9 @@ def granularSearch(inURL, inPayload, searchRate, collectVar, collectLock, collec
     start = inPayload['STARTDATETIME']
     loopEnd = 0
 
-    if searchRate == 'monthly':
+    if searchRate == 'yearly':
+        #make monthly requests
+    elif searchRate == 'monthly':
         # make daily requests
         month =  int(cdp.getMonth(start))
         loopEnd = MONTH_END[month]
@@ -107,9 +109,6 @@ def granularSearch(inURL, inPayload, searchRate, collectVar, collectLock, collec
         # make minute by minute requests
         loopEnd = 60
 
-    # thread container
-    granularThreads = []
-
     for openThread in range(loopEnd):
 
         if searchRate == 'monthly':
@@ -121,14 +120,9 @@ def granularSearch(inURL, inPayload, searchRate, collectVar, collectLock, collec
 
         inPayload['ENDDATETIME'] = end
         
-        granularThreads.append(threading.Thread(target=granularReq, args=(inURL, inPayload, searchRate, collectVar, collectLock, collectKey, processResults)))
-        granularThreads[openThread].start()
-        
         start = end
         inPayload['STARTDATETIME'] = start
 
-    for closeThread in range(loopEnd):
-        granularThreads[closeThread].join()
     
     return None
 
@@ -137,6 +131,8 @@ def gdeltReq(inURL, inPayload, searchRate, collectVar, collectLock, collectKey, 
     # otherwise alters payload variable that was passed into it
     inPayload = copy.deepcopy(inPayload)
 
+
+    """
     REQ_LOCK.acquire()
 
     resp = requests.get(inURL, params=inPayload)
@@ -162,6 +158,8 @@ def gdeltReq(inURL, inPayload, searchRate, collectVar, collectLock, collectKey, 
         else:
             # perform a more granular search
             granularSearch(inURL, inPayload, searchRate, collectVar, collectLock, collectKey, processResults)
+
+    """
     return None
 
 def testG(inG, key):
