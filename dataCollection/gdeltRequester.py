@@ -44,7 +44,7 @@ for cCount in range(NUM_COUNTRIES):
 countryFile.close()
 
 # TEST EXAMPLE
-COUNTRIES = [['CA', 'Canada']]
+COUNTRIES = [['US', 'United States']]
 COUNTRIES_LOCK.release()
 
 REQ_QUEUE = queue.Queue()
@@ -95,23 +95,18 @@ def granularSearch(inList):
         newReqList[6] = newSearchRate
 
         # add new granular search to request queue
-        print('before granular acquire')
         REQ_QUEUE_LOCK.acquire()
         print('putting somethign on the REQ_QUEUE')
         REQ_QUEUE.put(newReqList)
         REQ_QUEUE_LOCK.release()
 
         start = end
-
-    print('ENDING GRANULAR')
     return None
 
 # builds and sends the request from the variables in the REQ_QUEUE
 # if the MAX_RESULTS are found put more granular searches in the REQ_QUEUE
 def makeReq(inList):
-
-    print('here')
-    print(inList)
+    print(f'MAKE {inList}')
     # builds payload of parameters of query
     payload = {}
     payload['MODE'] = inList[0]
@@ -135,22 +130,14 @@ def makeReq(inList):
         print('exception handling')
         results = json.loads(correctStr)
 
-
-    print('before article limit')
-    print(f'len keys {len(results.keys())}')
     # checks to see if more granular searches are necessary or if results can be recorded
     if (len(results.keys()) > 0):
         articles = len(results['articles'])
-        print(f'articles {articles}')
         if articles < MAX_ARTICLES:
             # do something with articles results
             print(f'num articles found {articles}')
         else:
-            print('have to make a granular search')
-            print(f'search rate {searchRate}')
             granularSearch(inList)
-
-    print('ENDING MAKE REQ')
     return None
 
 # takes requests off of the queue and calls to execute the request
@@ -159,10 +146,12 @@ def reqConsumer():
     REQ_QUEUE_LOCK.acquire()
     
     print('getting something from the REQ_QUEUE')
-    newReq = REQ_QUEUE.get()
-    REQ_QUEUE_LOCK.release()
+    if not REQ_QUEUE.empty():
+        newReq = REQ_QUEUE.get()
+        REQ_QUEUE_LOCK.release()
+        makeReq(newReq)
 
-    makeReq(newReq)
+    REQ_QUEUE_LOCK.release()
 
     return None
 
@@ -171,10 +160,13 @@ def mainRequester():
     
     REQ_QUEUE_LOCK.acquire()
     while not REQ_QUEUE.empty():
+        currNumReqs = REQ_QUEUE.qsize()
         REQ_QUEUE_LOCK.release()
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.submit(reqConsumer)
+            
+            for i in range(currNumReqs):
+                executor.submit(reqConsumer)
         
         REQ_QUEUE_LOCK.acquire()
     REQ_QUEUE_LOCK.release()
