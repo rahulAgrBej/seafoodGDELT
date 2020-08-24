@@ -1,3 +1,5 @@
+# Gets count data for all 50 states for the query seafood AND (coronavirus OR covid-19)
+
 import requests
 import json
 import urllib.parse
@@ -7,7 +9,6 @@ def urlPrep(currStr):
     return urllib.parse.urlencode(currStr)
 
 API_URL = "https://article-search-api.herokuapp.com/api/searchTrends"
-# 
 
 stateNames = ["Alaska", "Alabama", "Arkansas", "American Samoa", "Arizona", "California", "Colorado", "Connecticut", "District of Columbia", "Delaware", "Florida", "Georgia", "Guam", "Hawaii", "Iowa", "Idaho", "Illinois", "Indiana", "Kansas", "Kentucky", "Louisiana", "Massachusetts", "Maryland", "Maine", "Michigan", "Minnesota", "Missouri", "Mississippi", "Montana", "North Carolina", "North Dakota", "Nebraska", "New Hampshire", "New Jersey", "New Mexico", "Nevada", "New York", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Puerto Rico", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Virginia", "Virgin Islands", "Vermont", "Washington", "Wisconsin", "West Virginia", "Wyoming"]
 payload = {}
