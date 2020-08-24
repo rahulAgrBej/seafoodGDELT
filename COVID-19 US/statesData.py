@@ -45,4 +45,3 @@ for state in stateNames:
     #time.sleep(5)
 print("followup")
 print(followUp)
-    
