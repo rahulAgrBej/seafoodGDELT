@@ -40,6 +40,8 @@ def getTimeframes(filePath):
 
                 # save the dates you have collected up to this point as a timeframe
                 # and reset all values again
+                newEndDate = endDate[0:9] + "235959Z"
+                endDate = newEndDate
                 timeFrames.append([startDate, endDate])
                 startDate = tf["date"]
                 endDate = tf["date"]
