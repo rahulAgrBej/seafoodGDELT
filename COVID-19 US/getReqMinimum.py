@@ -38,8 +38,6 @@ def getTimeframes(filePath):
             # if there are more articles on a particular day than limit
             if tf["value"] > countLimit:
 
-
-
                 # save the dates you have collected up to this point as a timeframe
                 # and reset all values again
                 timeFrames.append([startDate, endDate])
@@ -72,31 +70,24 @@ def getTimeframes(filePath):
                     excessDates = excessData["results"][0]["timeline"][0]["data"]
 
                     for ed in excessDates:
+
                         if (count + ed["value"] > countLimit):
                             timeFrames.append([startDate, endDate])
-                            startDate = endDate
+                            startDate = ed["date"]
                             count = ed["value"]
                         else:
                             count += ed["value"]
                         
                         endDate = ed["date"]
-                    
-                    if len(timeFrames) > 0:                    
-                        # append last time frame incase it already hasn't been appended
-                        lastStart = timeFrames[-1][0]
-                        lastEnd = timeFrames[-1][1]
-
-                        if not ((startDate == lastStart) and (endDate == lastEnd)):
-                            timeFrames.append([startDate, endDate])
-                    else:
-                        timeFrames.append([startDate, endDate])
 
             else:
 
                 # check to see if result limit would be exceeded
                 if ((count + tf["value"]) > countLimit):
+                    newEndDate = endDate[0:9] + "235959Z"
+                    endDate = newEndDate
                     timeFrames.append([startDate, endDate])
-                    startDate = endDate
+                    startDate = tf["date"]
                     count = tf["value"]
                 else:
                     count += tf["value"]
