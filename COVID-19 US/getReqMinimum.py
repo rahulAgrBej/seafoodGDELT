@@ -102,8 +102,12 @@ def getTimeframes(state, filePath):
             lastEnd = timeFrames[-1][1]
 
             if not ((startDate == lastStart) and (endDate == lastEnd)):
+                newEndDate = endDate[0:9] + "235959Z"
+                endDate = newEndDate
                 timeFrames.append([state, startDate, endDate])
         else:
+            newEndDate = endDate[0:9] + "235959Z"
+            endDate = newEndDate
             timeFrames.append([state, startDate, endDate])
 
     return timeFrames
