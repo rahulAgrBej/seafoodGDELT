@@ -13,9 +13,9 @@ def getDateTime(inDate):
 
 
     newTimeStr = ""
-    hour = inDate[10:12]
-    minute = inDate[12:14]
-    seconds = inDate[14:16]
+    hour = inDate[9:11]
+    minute = inDate[11:13]
+    seconds = inDate[13:15]
     newTimeStr = hour + ":" + minute + ":" + seconds
     return newDateStr, newTimeStr
 
@@ -43,7 +43,8 @@ for req in stateTimeframes:
     startDate, startTime = getDateTime(req[1])
     endDate, endTime = getDateTime(req[2])
 
-    sendReq = [query, country, startDate, startTime, endDate, endTime]
+    sendReq = [query, countryUS, startDate, startTime, endDate, endTime]
+    print(sendReq)
     batch.append(sendReq)
 
     if (reqCounter == reqLimit):
@@ -55,7 +56,7 @@ for req in stateTimeframes:
             articles.extend(resp.json()["results"][0]["articles"])
 
         reqTotal += reqCounter
-        print(str(reqTotal) "out of " str(len(stateTimeframes)))
+        print(str(reqTotal) + "out of " + str(len(stateTimeframes)))
 
         batch = []
         reqCounter = 0
@@ -69,7 +70,7 @@ if len(batch) > 0:
         articles.extend(resp.json()["results"][0]["articles"])
 
     reqTotal += len(batch)
-    print(str(reqTotal) "out of " str(len(stateTimeframes)))
+    print(str(reqTotal) + "out of " + str(len(stateTimeframes)))
 
 print("writing results to file")
 fResults = open("fullArticleData.txt", 'w')
