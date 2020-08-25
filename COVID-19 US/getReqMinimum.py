@@ -12,7 +12,7 @@ def getDateStr(inDate):
     newDateStr = month + "/" + day + "/" + year
     return newDateStr
 
-def getTimeframes(filePath):
+def getTimeframes(state, filePath):
 
     API_URL = "https://article-search-api.herokuapp.com/api/searchTrends?"
 
@@ -42,7 +42,7 @@ def getTimeframes(filePath):
                 # and reset all values again
                 newEndDate = endDate[0:9] + "235959Z"
                 endDate = newEndDate
-                timeFrames.append([startDate, endDate])
+                timeFrames.append([state, startDate, endDate])
                 startDate = tf["date"]
                 endDate = tf["date"]
                 count = 0
@@ -74,7 +74,7 @@ def getTimeframes(filePath):
                     for ed in excessDates:
 
                         if (count + ed["value"] > countLimit):
-                            timeFrames.append([startDate, endDate])
+                            timeFrames.append([state, startDate, endDate])
                             startDate = ed["date"]
                             count = ed["value"]
                         else:
@@ -88,7 +88,7 @@ def getTimeframes(filePath):
                 if ((count + tf["value"]) > countLimit):
                     newEndDate = endDate[0:9] + "235959Z"
                     endDate = newEndDate
-                    timeFrames.append([startDate, endDate])
+                    timeFrames.append([state, startDate, endDate])
                     startDate = tf["date"]
                     count = tf["value"]
                 else:
@@ -102,16 +102,16 @@ def getTimeframes(filePath):
             lastEnd = timeFrames[-1][1]
 
             if not ((startDate == lastStart) and (endDate == lastEnd)):
-                timeFrames.append([startDate, endDate])
+                timeFrames.append([state, startDate, endDate])
         else:
-            timeFrames.append([startDate, endDate])
+            timeFrames.append([state, startDate, endDate])
 
     return timeFrames
 
 stateInfoPath = "statesInfo/"
 stateCountFiles = os.listdir(stateInfoPath)
 
-reqs = {}
+reqs = []
 reqTotal = 0
 
 for stateFile in stateCountFiles:
@@ -126,11 +126,10 @@ for stateFile in stateCountFiles:
             state += " "
 
 
-    reqs[state] = getTimeframes(stateFileName)
-    reqTotal += len(reqs[state])
+    reqs.extend(getTimeframes(state, stateFileName))
 
 print(reqs)
-print(reqTotal)
+print(len(reqs))
 
 f = open("stateReqs.txt", "w")
 f.write(json.dumps(reqs))
