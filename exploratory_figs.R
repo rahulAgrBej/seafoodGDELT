@@ -4,6 +4,8 @@
 library(rjson)
 library(tidyverse)
 library(ggplot2)
+library(lubridate)
+library(usmap)
 
 # Load US-wide data
 US <- fromJSON(file = "COVID-19 US/fullArticleData.txt")
@@ -16,13 +18,55 @@ US <- US %>%
   select(date, title) %>%
   distinct() 
 
-ggplot(US %>% group_by(date) %>% tally(), aes(x = date, y = n)) +
-  geom_line()
+g <- ggplot(US %>% group_by(date) %>% tally(), aes(x = date, y = n)) +
+  geom_line() +
+  labs(y = "Number of Articles", x = "Date") +
+  theme_minimal()
 
-# Load states data (need to )
-states <- fromJSON(file = "COVID-19 US/statesDateCounts/Alaska Counts.txt")
+jpeg(filename = file.path("COVID-19 US", "figs", paste("US_ts", ".jpeg", sep = "")), 
+       height = 3, width = 4, units = "in", res = 400)
+print(g)
+dev.off()
+
+# Load states data 
+state_files <- list.files("COVID-19 US/statesDateCounts")
+
+states <- fromJSON(file = file.path("COVID-19 US", "statesDateCounts", state_files[1]))
 states <- data.frame(matrix(unlist(states), nrow=length(states), byrow=T))
 colnames(states) <- c("date", "norm", "value")
 states <- states %>%
   separate(col = date, into = c("date", "time"), sep = "T") %>%
   mutate(date = as.Date(date, format = "%Y%m%d"))
+states$state <- substr(state_files[1], 1, nchar(state_files[1])-11)
+  
+for(i in 2:length(state_files)){
+  states_temp <- fromJSON(file = file.path("COVID-19 US", "statesDateCounts", state_files[i]))
+  states_temp <- data.frame(matrix(unlist(states_temp), nrow=length(states_temp), byrow=T))
+  colnames(states_temp) <- c("date", "norm", "value")
+  states_temp <- states_temp %>%
+    separate(col = date, into = c("date", "time"), sep = "T") %>%
+    mutate(date = as.Date(date, format = "%Y%m%d"))
+  states_temp$state <- substr(state_files[i], 1, nchar(state_files[i])-11)
+  
+  states <- states %>%
+    bind_rows(states_temp)
+}
+
+states$month <- month(states$date)
+states$value <- as.numeric(as.character(states$value))
+
+states_month <- states %>%
+  group_by(month, state) %>%
+  summarise(month_count = sum(value))
+
+months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+for(i in 1:length(months)){
+  g <-   plot_usmap(data = states_month %>% filter(month == i), values = "month_count") + 
+    scale_fill_continuous(name = paste("No. articles in", months[i])) + 
+    theme(legend.position = "right")
+  jpeg(filename = file.path("COVID-19 US", "figs", paste("states_", months[i], ".jpeg", sep = "")), 
+       height = 3, width = 4, units = "in", res = 400)
+  print(g)
+  dev.off()
+}
