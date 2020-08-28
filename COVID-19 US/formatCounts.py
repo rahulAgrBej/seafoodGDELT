@@ -12,7 +12,7 @@ for fName in fileNames:
     if len(strFormat) > 0:
         countData = json.loads(strFormat)
     
-        countData = countData["results"][0]["timeline"]
+        countData = countData["results"][0]["timeline"][0]["data"]
         wpath = os.path.join("statesDateCounts/", fName)
         
         wf = open(wpath, 'w')
