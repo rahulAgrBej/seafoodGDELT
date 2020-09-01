@@ -123,3 +123,27 @@ g <- ggplot(US %>% group_by(week) %>% tally() %>%
   theme_minimal()
 g
 
+# Evaluate article titles during peaks
+US %>% 
+  group_by(week) %>% 
+  tally() %>%
+  arrange(-n)
+
+# Top 10 weeks: 4-5, 12-13, 26-31
+themes_1 <- US %>%
+  filter(week %in% 4:5) %>%
+  select(title) %>%
+  distinct() %>%
+  arrange(title)
+
+themes_2 <- US %>%
+  filter(week %in% 12:13) %>%
+  select(title) %>%
+  distinct() %>%
+  arrange(title)
+
+themes_3 <- US %>%
+  filter(week %in% 26:31) %>%
+  select(title) %>%
+  distinct() %>%
+  arrange(title)
