@@ -7,28 +7,46 @@ library(ggplot2)
 library(lubridate)
 library(usmap)
 
-# Load US-wide data
+# Load US-wide data json file
 US <- fromJSON(file = "COVID-19 US/fullArticleData.txt")
 
+# Convert json to dataframe
 US <- data.frame(matrix(unlist(US), nrow=length(US), byrow=T))
 colnames(US) <- c("domain", "language", "seendate", "socialimage", "sourcecountry", "title", "url", "url_mobile")
+
+# Convert date/time to date format and select unique titles
 US <- US %>%
   separate(col = seendate, into = c("date", "time"), sep = "T") %>%
   mutate(date = as.Date(date, format = "%Y%m%d")) %>%
-  select(date, title) %>%
+  mutate(week = strftime(date, format = "%V")) %>%
+  select(date, week, title) %>%
   distinct() 
 
+US$week <- as.numeric(US$week)
+
+# Plot number of articles by day
 g <- ggplot(US %>% group_by(date) %>% tally(), aes(x = date, y = n)) +
   geom_line() +
   labs(y = "Number of Articles", x = "Date") +
   theme_minimal()
 
-jpeg(filename = file.path("COVID-19 US", "figs", paste("US_ts", ".jpeg", sep = "")), 
+jpeg(filename = file.path("COVID-19 US", "figs", paste("US_ts_daily", ".jpeg", sep = "")), 
+     height = 3, width = 4, units = "in", res = 400)
+print(g)
+dev.off()
+
+# Plot number of articles by week
+g <- ggplot(US %>% group_by(week) %>% tally(), aes(x = week, y = n)) +
+  geom_line() +
+  labs(y = "Number of Articles", x = "Week") +
+  theme_minimal()
+
+jpeg(filename = file.path("COVID-19 US", "figs", paste("US_ts_weekly", ".jpeg", sep = "")), 
        height = 3, width = 4, units = "in", res = 400)
 print(g)
 dev.off()
 
-# Load states data 
+# Load states data and create single dataframe for all states
 state_files <- list.files("COVID-19 US/statesDateCounts")
 
 states <- fromJSON(file = file.path("COVID-19 US", "statesDateCounts", state_files[1]))
@@ -52,13 +70,16 @@ for(i in 2:length(state_files)){
     bind_rows(states_temp)
 }
 
+# Summarize counts by month
 states$month <- month(states$date)
 states$value <- as.numeric(as.character(states$value))
+states$norm <- as.numeric(as.character(states$norm))
 
 states_month <- states %>%
   group_by(month, state) %>%
   summarise(month_count = sum(value))
 
+# Plot monthly state article counts (duplicates of articles cannot be removed)
 months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
 
 for(i in 1:length(months)){
@@ -70,3 +91,35 @@ for(i in 1:length(months)){
   print(g)
   dev.off()
 }
+
+# Normalize time series for US-wide article counts
+df_norm <- states %>% 
+  select(date, norm) %>%
+  mutate(week = strftime(date, format = "%V")) %>%
+  distinct()
+df_norm$week <- as.numeric(df_norm$week)
+
+# Plot normalized daily ts
+g <- ggplot(US %>% group_by(date) %>% tally() %>%
+              left_join(df_norm, by = "date") %>%
+              mutate(count_norm = n/norm), 
+            aes(x = date, y = count_norm)) +
+  geom_line() +
+  labs(y = "Number of Articles", x = "Date") +
+  theme_minimal()
+g
+
+# Plot normalized weekly ts
+df_norm_week <- df_norm %>%
+  group_by(week) %>%
+  summarise(norm = sum(norm))
+
+g <- ggplot(US %>% group_by(week) %>% tally() %>%
+              left_join(df_norm_week, by = "week") %>%
+              mutate(count_norm = n/norm), 
+            aes(x = week, y = count_norm)) +
+  geom_line() +
+  labs(y = "Number of Articles", x = "Date") +
+  theme_minimal()
+g
+
