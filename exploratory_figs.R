@@ -19,6 +19,8 @@ US <- US %>%
   separate(col = seendate, into = c("date", "time"), sep = "T") %>%
   mutate(date = as.Date(date, format = "%Y%m%d")) %>%
   mutate(week = strftime(date, format = "%V")) %>%
+  filter(!(str_detect(domain, "iheart.com$"))) %>% # remove irrelevant sources with high number of hits
+  mutate(title = substr(title, start = 1, stop = 30)) %>%
   select(date, week, title) %>%
   distinct() 
 
@@ -135,15 +137,18 @@ themes_1 <- US %>%
   select(title) %>%
   distinct() %>%
   arrange(title)
+# Weeks 4-5 (Jan 19-Feb 1) - Initial spread and outbreak, trade disruptions
 
 themes_2 <- US %>%
   filter(week %in% 12:13) %>%
   select(title) %>%
   distinct() %>%
   arrange(title)
+# Weeks 12-13 (Mar 17-27) - restuarant closures, relief bill
 
 themes_3 <- US %>%
   filter(week %in% 26:31) %>%
   select(title) %>%
   distinct() %>%
   arrange(title)
+# Weeks 26-31 (Jun 26- Aug 1) - unemployment, lobster prices (and EO for lobsters), and broader economic damage
