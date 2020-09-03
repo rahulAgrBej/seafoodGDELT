@@ -144,7 +144,7 @@ themes_2 <- US %>%
   select(title) %>%
   distinct() %>%
   arrange(title)
-# Weeks 12-13 (Mar 17-27) - restuarant closures, relief bill
+# Weeks 12-13 (Mar 17-27) - restaurant closures, relief bill
 
 themes_3 <- US %>%
   filter(week %in% 26:31) %>%
