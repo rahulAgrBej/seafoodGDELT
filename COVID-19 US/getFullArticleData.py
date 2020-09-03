@@ -24,8 +24,7 @@ def getDateTime(inDate):
 ARTICLE_SEARCH_API = "https://article-search-api.herokuapp.com/api/getFullInfo"
 
 folderName = "statesMinReqs/"
-#statesFilesNames = os.listdir(folderName)
-statesFilesNames = ["minReqsAlaska.txt"]
+statesFilesNames = os.listdir(folderName)
 for fName in statesFilesNames:
     print(fName)
     fPath = os.path.join(folderName, fName)
