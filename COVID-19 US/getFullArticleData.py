@@ -2,6 +2,7 @@
 import requests
 import json
 import urllib.parse
+import os
 
 def getDateTime(inDate):
     
@@ -22,58 +23,75 @@ def getDateTime(inDate):
 
 ARTICLE_SEARCH_API = "https://article-search-api.herokuapp.com/api/getFullInfo"
 
-# get timeframes for each state
-f = open("stateReqs.txt", "r")
-dataStr = f.read()
-f.close()
-stateTimeframes = json.loads(dataStr)
+folderName = "statesMinReqs/"
+#statesFilesNames = os.listdir(folderName)
+statesFilesNames = ["minReqsAlaska.txt"]
+for fName in statesFilesNames:
+    print(fName)
+    fPath = os.path.join(folderName, fName)
+    f = open(fPath, "r")
+    stringData = f.read()
+    f.close()
+    minStateReqs = json.loads(stringData)
 
-reqLimit = 15
+    reqLimit = 15
 
-reqCounter = 0
-countries = []
-batch = []
-articles = []
-reqTotal = 0
-for req in stateTimeframes:
-    reqCounter += 1
-    query = 'seafood (coronavirus OR ' + '\"' + "COVID-19" + '\") ' +  '\"' + req[0] + '\"'
-    countryUS = {}
-    countryUS["id"] = "US"
-    startDate, startTime = getDateTime(req[1])
-    endDate, endTime = getDateTime(req[2])
+    reqCounter = 0
+    countries = []
+    batch = []
+    articles = []
+    reqTotal = 0
+    for req in minStateReqs:
+        reqCounter += 1
+        query = '(seafood OR fishery OR fisheries OR aquaculture) (coronavirus OR \"Covid-19\") ' +  '\"' + req[0] + '\"'
+        countryUS = {}
+        countryUS["id"] = "US"
+        startDate, startTime = getDateTime(req[1])
+        endDate, endTime = getDateTime(req[2])
 
-    sendReq = [query, countryUS, startDate, startTime, endDate, endTime]
-    print(sendReq)
-    batch.append(sendReq)
+        sendReq = [query, countryUS, startDate, startTime, endDate, endTime]
+        print(sendReq)
+        batch.append(sendReq)
 
-    if (reqCounter == reqLimit):
+        if (reqCounter == reqLimit):
+            payload = {}
+            payload["requestsSent"] = json.dumps(batch)
+            resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
+            print(resp)
+            if resp.status_code == 200:
+                responseResults = resp.json()["results"]
+                for res in responseResults:
+                    articles.extend(res["articles"])
+            else:
+                print("error occurred")
+                
+
+            reqTotal += reqCounter
+            print(str(reqTotal) + "out of " + str(len(minStateReqs)))
+
+            batch = []
+            reqCounter = 0
+    
+    if len(batch) > 0:
         payload = {}
         payload["requestsSent"] = json.dumps(batch)
         resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
         print(resp)
+    
         if resp.status_code == 200:
-            articles.extend(resp.json()["results"][0]["articles"])
-
-        reqTotal += reqCounter
-        print(str(reqTotal) + "out of " + str(len(stateTimeframes)))
-
-        batch = []
-        reqCounter = 0
-
-if len(batch) > 0:
-    payload = {}
-    payload["requestsSent"] = json.dumps(batch)
-    resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
-    print(resp)
-    if resp.status_code == 200:
-        articles.extend(resp.json()["results"][0]["articles"])
+            responseResults = resp.json()["results"]
+            for res in responseResults:
+                articles.extend(res["articles"])
 
     reqTotal += len(batch)
-    print(str(reqTotal) + "out of " + str(len(stateTimeframes)))
+    print(str(reqTotal) + "out of " + str(len(minStateReqs)))
 
-print("writing results to file")
-fResults = open("fullArticleData.txt", 'w')
-fResults.write(json.dumps(articles))
-fResults.close()
-print("DONE!!!!!!!!!!")
+    outFolder = "statesFullArticles/"
+    stateName = fName[7:]
+    outFile = os.path.join(outFolder, stateName)
+    fOut = open(outFile, "w")
+    fOut.write(json.dumps(articles))
+    fOut.close()
+    print(stateName + " DONE")
+
+print("COMPLETELY DONE!!!")    
