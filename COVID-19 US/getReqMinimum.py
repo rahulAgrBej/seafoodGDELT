@@ -15,6 +15,7 @@ def getDateStr(inDate):
 def getTimeframes(state, filePath):
 
     API_URL = "https://article-search-api.herokuapp.com/api/searchTrends?"
+    FINAL_QUERY = '(seafood OR fishery OR fisheries OR aquaculture) (coronavirus OR \"covid-19\") '
 
     f = open(filePath, 'r')
     stateCountDataStr = f.read()
@@ -25,7 +26,7 @@ def getTimeframes(state, filePath):
     if (len(stateCountDataStr) > 0):
 
         stateCountData = json.loads(stateCountDataStr)
-        stateTimeData = stateCountData["results"][0]["timeline"][0]["data"]
+        stateTimeData = stateCountData
 
         countLimit = 250
         startDate = stateTimeData[0]["date"]
@@ -53,7 +54,7 @@ def getTimeframes(state, filePath):
                 countryUS["id"] = "US"
                 countries.append(countryUS)
 
-                query = stateCountData["results"][0]["query_details"]["title"]
+                query = FINAL_QUERY + '\"' + state + '\"'
 
                 payload = {}
                 payload['q'] = json.dumps(query)
@@ -112,7 +113,7 @@ def getTimeframes(state, filePath):
 
     return timeFrames
 
-stateInfoPath = "statesInfo/"
+stateInfoPath = "statesCountsExtendedQuery/"
 stateCountFiles = os.listdir(stateInfoPath)
 
 reqs = []
@@ -129,12 +130,9 @@ for stateFile in stateCountFiles:
         if (i < (len(fileName) - 2)):
             state += " "
 
-
-    reqs.extend(getTimeframes(state, stateFileName))
-
-print(reqs)
-print(len(reqs))
-
-f = open("stateReqs.txt", "w")
-f.write(json.dumps(reqs))
-f.close()
+    minTimeFrames = getTimeframes(state, stateFileName)
+    outFileName = "minReqs" + state + ".txt"
+    outPath = os.path.join("statesMinReqs/", outFileName)
+    f = open(outPath, 'w')
+    f.write(json.dumps(minTimeFrames))
+    f.close()
