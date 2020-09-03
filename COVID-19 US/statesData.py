@@ -12,7 +12,7 @@ API_URL = "https://article-search-api.herokuapp.com/api/searchTrends"
 
 stateNames = ["Alaska", "Alabama", "Arkansas", "American Samoa", "Arizona", "California", "Colorado", "Connecticut", "District of Columbia", "Delaware", "Florida", "Georgia", "Guam", "Hawaii", "Iowa", "Idaho", "Illinois", "Indiana", "Kansas", "Kentucky", "Louisiana", "Massachusetts", "Maryland", "Maine", "Michigan", "Minnesota", "Missouri", "Mississippi", "Montana", "North Carolina", "North Dakota", "Nebraska", "New Hampshire", "New Jersey", "New Mexico", "Nevada", "New York", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Puerto Rico", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Virginia", "Virgin Islands", "Vermont", "Washington", "Wisconsin", "West Virginia", "Wyoming"]
 payload = {}
-queryStr = 'seafood ("COVID-19" OR coronavirus) '
+queryStr = '(seafood OR fishery OR fisheries OR aquaculture) (coronavirus OR \"covid-19\") '
 
 followUp = []
 for state in stateNames:
@@ -26,7 +26,7 @@ for state in stateNames:
     payload['q'] = json.dumps(finalQuery)
     payload['startDate'] = json.dumps("01/01/2020")
     payload['startTime'] = json.dumps("00:00:00")
-    payload['endDate'] = json.dumps("08/01/2020")
+    payload['endDate'] = json.dumps("09/01/2020")
     payload['endTime'] = json.dumps("00:00:00")
     payload['countries'] = json.dumps(countries)
 
@@ -36,8 +36,8 @@ for state in stateNames:
     print(resp)
 
     if (resp.status_code == 200):
-        f = open("statesInfo/" + state + " Counts.txt", 'w')
-        f.write(json.dumps(resp.json()))
+        f = open("statesCountsExtendedQuery/" + state + " Counts.txt", 'w')
+        f.write(json.dumps(resp.json()["results"][0]["timeline"][0]["data"]))
         f.close()
     else:
         followUp.append(state)
