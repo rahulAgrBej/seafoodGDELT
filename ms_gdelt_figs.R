@@ -105,7 +105,7 @@ states_month <- states_month %>%
     month == 7 ~ "Jul",
     month == 8 ~ "Aug",
   ))
-
+states_month$month <- factor(states_month$month, levels = months)
 g <- plot_usmap(data = states_month, values = "n") + 
   scale_fill_continuous(limits = c(0,800), name = "No. of articles") + 
   theme_map() +
@@ -151,5 +151,9 @@ jpeg(filename = file.path("COVID-19 US", "figs", paste("US_ts_weekly", ".jpeg", 
 print(g)
 dev.off()
 
-
+# Interesting peaks:
+# Week 4
+# Weeks 12-17
+# Week 19
+# Week 30
 
