@@ -17,10 +17,14 @@ countries = [
     ]
 
 countryCombos = permutations(countries, 2)
+
 for combo in countryCombos:
-    print(combo)
+    sourceCountry = combo[0]
+    targetCountry = combo[1]
 
-
+    query = "(" + targetCountry[1] + " OR " + targetCountry[2] + ")"
+    query += " salmon (export OR exports OR import OR imports OR trade)"
+    print(query)
 
 """
 urllib.parse.urlencode(currStr)
