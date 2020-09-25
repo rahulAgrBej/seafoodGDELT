@@ -16,6 +16,39 @@ countries = [
     {"id": "US", "name": "United States", "descriptor": "American"}
     ]
 
+perms = permutations(countries, 2)
+
+for entry in perms:
+    sourceCountry = entry[0]
+    targetCountry = entry[1]
+
+    query = "(" + targetCountry["name"] + " OR " + targetCountry["descriptor"] + ") (" + sourceCountry["name"] + " OR " + sourceCountry["descriptor"] + ") salmon (import OR imports OR export OR exports OR trade)"
+    
+    payload = {}
+    payload["countries"] = json.dumps([sourceCountry])
+    payload['q'] = json.dumps(query)
+    payload['startDate'] = json.dumps("01/01/2017")
+    payload['startTime'] = json.dumps("00:00:00")
+    payload['endDate'] = json.dumps("01/01/2018")
+    payload['endTime'] = json.dumps("00:00:00")
+
+    print(payload)
+
+    encodedPayload = urllib.parse.urlencode(payload)
+    finalURL = FREQ_API_URL + "?" + encodedPayload
+    resp = requests.get(finalURL)
+    print(resp.status_code)
+    data = resp.json()["results"]
+    print(len(data))
+    for source in data:
+        fName = targetCountry["name"] + " salmon trade source:" + source["query_details"]["title"][-2:]
+        fPath = "freqResults/" + fName
+        f = open(fPath, "w")
+        f.write(json.dumps(source["timeline"][0]["data"]))
+        f.close()
+
+
+"""
 for idx in range(len(countries)):
 
     targetCountry = countries[idx]
@@ -56,3 +89,4 @@ for idx in range(len(countries)):
         f = open(fPath, "w")
         f.write(json.dumps(source["timeline"][0]["data"]))
         f.close()
+"""
