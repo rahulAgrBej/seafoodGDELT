@@ -1,15 +1,26 @@
 import requests
 import json
 import urllib.parse
-from itertools import combinations
+from itertools import permutations
 
 FREQ_API_URL = "https://article-search-api.herokuapp.com/api/searchTrends"
 
-countries = [["NO", "Norway"], ["CI", "Chile"], ["RS", "Russia"], ["CH", "China"], ["CA", "Canada"], ["SW", "Sweden"], ["JA", "Japan"], ["US", "United States"]]
+countries = [
+    ["NO", "Norway", "Norwegian"],
+    ["CI", "Chile", "Chilean"],
+    ["RS", "Russia", "Russian"],
+    ["CH", "China", "Chinese"],
+    ["CA", "Canada", "Canadian"],
+    ["SW", "Sweden", "Swedish"],
+    ["JA", "Japan", "Japanese"],
+    ["US", "United States", "American"]
+    ]
 
-countryCombos = combinations(countries, 2)
+countryCombos = permutations(countries, 2)
 for combo in countryCombos:
     print(combo)
+
+
 
 """
 urllib.parse.urlencode(currStr)
