@@ -6,41 +6,52 @@ from itertools import permutations
 FREQ_API_URL = "https://article-search-api.herokuapp.com/api/searchTrends"
 
 countries = [
-    ["NO", "Norway", "Norwegian"],
-    ["CI", "Chile", "Chilean"],
-    ["RS", "Russia", "Russian"],
-    ["CH", "China", "Chinese"],
-    ["CA", "Canada", "Canadian"],
-    ["SW", "Sweden", "Swedish"],
-    ["JA", "Japan", "Japanese"],
-    ["US", "United States", "American"]
+    {"id": "NO", "name": "Norway", "descriptor": "Norwegian"},
+    {"id": "CI", "name": "Chile", "descriptor": "Chilean"},
+    {"id": "RS", "name": "Russia", "descriptor": "Russian"},
+    {"id": "CH", "name": "China", "descriptor": "Chinese"},
+    {"id": "CA", "name": "Canada", "descriptor": "Canadian"},
+    {"id": "SW", "name": "Sweden", "descriptor": "Swedish"},
+    {"id": "JA", "name": "Japan", "descriptor": "Japanese"},
+    {"id": "US", "name": "United States", "descriptor": "American"}
     ]
 
-countryCombos = permutations(countries, 2)
+for idx in range(len(countries)):
 
-for combo in countryCombos:
-    sourceCountry = combo[0]
-    targetCountry = combo[1]
+    if idx == 1:
+        targetCountry = countries[idx]
+        sourceCountries = []
+        
+        if ((idx > 0) and (idx < (len(countries) - 1))):
+            sourceCountries = countries[0:idx]
+            sourceCountries.extend(countries[(idx + 1):])
+        elif idx == 0:
+            sourceCountries = countries[1:]
+        else:
+            sourceCountries = countries[:-1]
 
-    query = "(" + targetCountry[1] + " OR " + targetCountry[2] + ")"
-    query += " salmon (export OR exports OR import OR imports OR trade)"
-    print(query)
+        print(sourceCountries)
+        print()
 
-"""
-urllib.parse.urlencode(currStr)
+        query = "(" + targetCountry["name"] + " OR " + targetCountry["descriptor"] + ")  salmon (import OR imports OR export OR exports OR trade)"
+        
+        payload = {}
+        payload["countries"] = json.dumps(sourceCountries)
+        payload['q'] = json.dumps(query)
+        payload['startDate'] = json.dumps("01/01/2017")
+        payload['startTime'] = json.dumps("00:00:00")
+        payload['endDate'] = json.dumps("01/01/2018")
+        payload['endTime'] = json.dumps("00:00:00")
 
-query = "Japan salmon trade"
+        print(payload)
 
-countries = []
-countryUS = {}
-countryUS["id"] = "US"
-countries.append(countryUS)
+        encodedPayload = urllib.parse.urlencode(payload)
+        finalURL = FREQ_API_URL + "?" + encodedPayload
+        resp = requests.get(finalURL)
+        print(resp.status_code)
+        data = resp.json()["results"]
+        print(len(data))
+        for d in data:
+            print(d["query_details"])
 
-payload = {}
-payload['q'] = json.dumps(finalQuery)
-payload['startDate'] = json.dumps("01/01/2020")
-payload['startTime'] = json.dumps("00:00:00")
-payload['endDate'] = json.dumps("09/01/2020")
-payload['endTime'] = json.dumps("00:00:00")
-payload['countries'] = json.dumps(countries)
-"""
+        break
