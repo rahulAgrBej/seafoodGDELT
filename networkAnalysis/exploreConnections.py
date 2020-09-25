@@ -18,40 +18,41 @@ countries = [
 
 for idx in range(len(countries)):
 
-    if idx == 1:
-        targetCountry = countries[idx]
-        sourceCountries = []
-        
-        if ((idx > 0) and (idx < (len(countries) - 1))):
-            sourceCountries = countries[0:idx]
-            sourceCountries.extend(countries[(idx + 1):])
-        elif idx == 0:
-            sourceCountries = countries[1:]
-        else:
-            sourceCountries = countries[:-1]
+    targetCountry = countries[idx]
+    sourceCountries = []
+    
+    if ((idx > 0) and (idx < (len(countries) - 1))):
+        sourceCountries = countries[0:idx]
+        sourceCountries.extend(countries[(idx + 1):])
+    elif idx == 0:
+        sourceCountries = countries[1:]
+    else:
+        sourceCountries = countries[:-1]
 
-        print(sourceCountries)
-        print()
+    print(sourceCountries)
+    print()
 
-        query = "(" + targetCountry["name"] + " OR " + targetCountry["descriptor"] + ")  salmon (import OR imports OR export OR exports OR trade)"
-        
-        payload = {}
-        payload["countries"] = json.dumps(sourceCountries)
-        payload['q'] = json.dumps(query)
-        payload['startDate'] = json.dumps("01/01/2017")
-        payload['startTime'] = json.dumps("00:00:00")
-        payload['endDate'] = json.dumps("01/01/2018")
-        payload['endTime'] = json.dumps("00:00:00")
+    query = "(" + targetCountry["name"] + " OR " + targetCountry["descriptor"] + ")  salmon (import OR imports OR export OR exports OR trade)"
+    
+    payload = {}
+    payload["countries"] = json.dumps(sourceCountries)
+    payload['q'] = json.dumps(query)
+    payload['startDate'] = json.dumps("01/01/2017")
+    payload['startTime'] = json.dumps("00:00:00")
+    payload['endDate'] = json.dumps("01/01/2018")
+    payload['endTime'] = json.dumps("00:00:00")
 
-        print(payload)
+    print(payload)
 
-        encodedPayload = urllib.parse.urlencode(payload)
-        finalURL = FREQ_API_URL + "?" + encodedPayload
-        resp = requests.get(finalURL)
-        print(resp.status_code)
-        data = resp.json()["results"]
-        print(len(data))
-        for d in data:
-            print(d["query_details"])
-
-        break
+    encodedPayload = urllib.parse.urlencode(payload)
+    finalURL = FREQ_API_URL + "?" + encodedPayload
+    resp = requests.get(finalURL)
+    print(resp.status_code)
+    data = resp.json()["results"]
+    print(len(data))
+    for source in data:
+        fName = targetCountry["name"] + " salmon trade source:" + source["query_details"]["title"][-2:]
+        fPath = "freqResults/" + fName
+        f = open(fPath, "w")
+        f.write(json.dumps(source["timeline"][0]["data"]))
+        f.close()
