@@ -4,7 +4,7 @@ import json
 folderPath = 'stage0/'
 fileNames = os.listdir(folderPath)
 
-csvContent = "country1,country2,sourceCountry,year,month,day\n"
+csvContent = "country1,country2,sourceCountry,frequency,norm,year,month,day\n"
 
 for fName in fileNames:
     # open the file
@@ -21,8 +21,11 @@ for fName in fileNames:
         year = int(row['date'][:4])
         month = int(row['date'][4:6])
         day = int(row['date'][6:8])
+
+        value = int(row['value'])
+        norm = int(row['norm'])
         
-        outRow = country1 + ',' + country2 + ',' + sourceCountry + ',' + str(year) + ',' + str(month) + ',' + str(day) + '\n'
+        outRow = country1 + ',' + country2 + ',' + sourceCountry + ',' + str(value) + ',' + str(norm) + ',' + str(year) + ',' + str(month) + ',' + str(day) + '\n'
         csvContent = csvContent + outRow
     print("done with file: " + fName)
 
