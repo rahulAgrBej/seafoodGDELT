@@ -85,6 +85,7 @@ for fName in fileNames:
                 
                 if 'articles' in res:
                     for articleHit in res['articles']:
+                        articleHit['title'].replace(',', '', )
                         csvContent = csvContent + \
                                         firstCountryCode + ',' + \
                                         secondCountryCode + ',' + \
@@ -93,7 +94,7 @@ for fName in fileNames:
                                         str(int(articleHit['seendate'][4:6])) + ',' + \
                                         str(int(articleHit['seendate'][6:8])) + ',' + \
                                         articleHit['domain'] + ',' + \
-                                        articleHit['title'] + ',' + \
+                                        articleHit['title'].replace(',', '') + ',' + \
                                         articleHit['url'] + ',' + \
                                         articleHit['socialimage'] + ',' +\
                                         articleHit['language'] + '\n'
@@ -106,5 +107,5 @@ for fName in fileNames:
                 else:
                     print(res)
 
-            batch = []
+        batch = []
 
