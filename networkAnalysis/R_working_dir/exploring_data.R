@@ -33,4 +33,38 @@ jpeg(filename = "US_CH.jpeg", height = 3, width = 4, units ="in", res = 400)
 print(g1)
 dev.off()
 
-NO_SW
+CA_CH <- TotalFullArticleData %>%
+  filter((str_detect(country1, "CA") & str_detect(country2, "CH")))
+
+g2 <- ggplot(CA_CH %>% group_by(week) %>% tally(), aes(x = week,y = n)) +
+  geom_line() +
+  labs(y= "Number of Articles", x = "Week") +
+  theme_minimal()
+
+jpeg(filename = "CA_CH.jpeg", height = 3, width = 4, units ="in", res = 400)
+print(g2)
+dev.off()
+
+NO_CA <- TotalFullArticleData %>%
+  filter((str_detect(country1, "NO") & str_detect(country2, "CA")))
+
+g2 <- ggplot(NO_CA %>% group_by(week) %>% tally(), aes(x = week,y = n)) +
+  geom_line() +
+  labs(y= "Number of Articles", x = "Week") +
+  theme_minimal()
+
+jpeg(filename = "NO_CA.jpeg", height = 3, width = 4, units ="in", res = 400)
+print(g2)
+dev.off()
+
+NO_CI <- TotalFullArticleData %>%
+  filter((str_detect(country1, "NO") & str_detect(country2, "CI")))
+
+g2 <- ggplot(NO_CI %>% group_by(week) %>% tally(), aes(x = week,y = n)) +
+  geom_line() +
+  labs(y= "Number of Articles", x = "Week") +
+  theme_minimal()
+
+jpeg(filename = "NO_CI.jpeg", height = 3, width = 4, units ="in", res = 400)
+print(g2)
+dev.off()
