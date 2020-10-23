@@ -220,6 +220,55 @@ for r in reqs:
             print(resp.content)
         batch = []
 
+if len(batch) > 0:
+    payload = {}
+    payload["requestsSent"] = json.dumps(batch)
+    resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
+    print(resp)
+
+    if resp.status_code == 200:
+        # get info and put into CSV format
+        responseData = resp.json()['results']
+        print(len(responseData))
+        for res in responseData:
+            inQuery = res['query_details']['title']
+            sourceCountry = inQuery[-2:]
+            spaceSplit = inQuery.split(' ')
+
+            firstCountry = spaceSplit[0][1:]
+            secondCountry = ''
+
+            firstCountryCode = ''
+            secondCountryCode = ''
+
+            if firstCountry == '\"United':
+                secondCountry = spaceSplit[4][1:]
+            else:
+                secondCountry = spaceSplit[3][1:]
+            
+            firstCountryCode = countryCodes[firstCountry]
+            secondCountryCode = countryCodes[secondCountry]
+            
+            if 'articles' in res:
+                for articleHit in res['articles']:
+                    articleHit['title'].replace(',', '', )
+                    csvContent = csvContent + \
+                                    firstCountryCode + ',' + \
+                                    secondCountryCode + ',' + \
+                                    sourceCountry + ',' + \
+                                    articleHit['seendate'][:4] + ',' + \
+                                    str(int(articleHit['seendate'][4:6])) + ',' + \
+                                    str(int(articleHit['seendate'][6:8])) + ',' + \
+                                    articleHit['domain'] + ',' + \
+                                    articleHit['title'].replace(',', '') + ',' + \
+                                    articleHit['url'] + ',' + \
+                                    articleHit['socialimage'] + ',' +\
+                                    articleHit['language'] + '\n'
+    else:
+        print(batch)
+        print("ERROR HAPPENED")
+        print(resp.content)
+    
 
 fOut = open('over250FullArticles.csv', 'w')
 fOut.write(csvContent)
