@@ -6,7 +6,12 @@ TotalFullArticleData <- read_csv("TotalFullArticleData.csv")
 TotalFullArticleData <- TotalFullArticleData %>%
   mutate(date = make_date(year, month, day)) %>%
   mutate(week = strftime(date, format = "%V")) %>%
-  filter(!(str_detect(domain, "iheart.com$"))) # remove irrelevant sources with high number of hits
+  filter(
+    !(str_detect(domain, "iheart.com$")) &
+      !(str_detect(domain, "floridastar.com$")) &
+      !(str_detect(domain, "jewishtimes.com$")) &
+      !(str_detect(domain, "jewishtimes.com$")) &
+      !(str_detect(domain, "oyetimes.com$"))) # remove irrelevant sources with high number of hits
 
 TotalFullArticleData$week <- as.numeric(TotalFullArticleData$week)
 
