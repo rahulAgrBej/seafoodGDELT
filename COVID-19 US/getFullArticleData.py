@@ -84,7 +84,7 @@ for fName in statesFilesNames:
 
     reqTotal += len(batch)
     print(str(reqTotal) + "out of " + str(len(minStateReqs)))
-
+    
     outFolder = "statesFullArticles/"
     stateName = fName[7:]
     outFile = os.path.join(outFolder, stateName)
