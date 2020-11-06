@@ -1,3 +1,5 @@
+from itertools import permutations, combinations
+
 
 def readCountries():
 
@@ -14,5 +16,13 @@ def readCountries():
 
     return sourceCountries
 
+def allCombos():
+    combos = []
 
-print(readCountries())
+    sourceCountries = readCountries()
+    ids = sourceCountries.keys()
+    combos = permutations(ids, 2)
+
+    return combos
+
+print([i for i in allCombos()])
