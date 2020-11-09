@@ -263,7 +263,7 @@ UZ	Uzbekistan
 NH	Vanuatu
 VT	Vatican City
 VE	Venezuela
-VM	Vietnam, Democratic Republic of
+VM	Vietnam
 VQ	Virgin Islands
 WQ	Wake Island
 WF	Wallis and Futuna
