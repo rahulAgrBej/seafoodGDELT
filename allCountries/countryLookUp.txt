@@ -56,7 +56,7 @@ CF	Congo
 CW	Cook Islands
 CR	Coral Sea Islands
 CS	Costa Rica
-IV	Cote dIvoire
+IV	Cote d'Ivoire
 HR	Croatia
 CU	Cuba
 CY	Cyprus
