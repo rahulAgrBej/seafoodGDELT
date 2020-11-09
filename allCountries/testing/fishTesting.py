@@ -20,9 +20,14 @@ payload1['ENDDATETIME'] = '20180101000000'
 resp1 = requests.get(GDELT_URL, params=payload1)
 data1 = resp1.json()
 
-print(data1)
+results1 = data1['timeline'][0]['data']
+sum1 = 0
 
-"""
+
+for result in results1:
+    sum1 += result['value']
+
+# to satisfy GDELT requirements
 time.sleep(5)
 
 payload2 = {}
@@ -35,4 +40,16 @@ payload2['ENDDATETIME'] = '20180101000000'
 
 resp2 = requests.get(GDELT_URL, params=payload2)
 data2 = resp2.json()
-"""
+results2 = data2['timeline'][0]['data']
+sum2 = 0
+
+for res in results2:
+    sum2 += res['value']
+
+print(f'Query w/ just FISH: {sum1}')
+print(f'Query w/ FISH or CATFISH {sum2}')
+
+if sum1 == sum2:
+    print('results ARE the same')
+else:
+    print('results are NOT the same')
