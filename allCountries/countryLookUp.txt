@@ -62,7 +62,7 @@ CU	Cuba
 CY	Cyprus
 EZ	Czech Republic
 LO	Czechoslovakia
-CG	Democratic Republic of the Congo
+CG	Congo
 DA	Denmark
 DX	Dhekelia Sovereign Base Area
 DJ	Djibouti
