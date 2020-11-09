@@ -254,7 +254,6 @@ TV	Tuvalu
 UG	Uganda
 UP	Ukraine
 UF	Undersea Features
-UU	Undesignated Sovereignty
 AE	United Arab Emirates
 UK	United Kingdom
 US	United States
