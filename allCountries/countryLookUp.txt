@@ -2,7 +2,7 @@ AF	Afghanistan
 AX	Akrotiri Sovereign Base Area
 AL	Albania
 AG	Algeria
-AQ	American Samoa
+AQ	Samoa
 AN	Andorra
 AO	Angola
 AV	Anguilla
