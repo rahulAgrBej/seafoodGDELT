@@ -11,7 +11,7 @@ AC	Antigua Barbuda
 AR	Argentina
 AM	Armenia
 AA	Aruba
-AT	Ashmore and Cartier Islands
+AT	Ashmore Cartier Islands
 AS	Australia
 AU	Austria
 AJ	Azerbaijan
