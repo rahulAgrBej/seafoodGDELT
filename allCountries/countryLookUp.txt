@@ -7,7 +7,7 @@ AN	Andorra
 AO	Angola
 AV	Anguilla
 AY	Antarctica
-AC	Antigua and Barbuda
+AC	Antigua Barbuda
 AR	Argentina
 AM	Armenia
 AA	Aruba
