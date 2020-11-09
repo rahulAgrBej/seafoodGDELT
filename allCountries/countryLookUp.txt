@@ -28,7 +28,7 @@ BN	Benin
 BD	Bermuda
 BT	Bhutan
 BL	Bolivia
-BK	Bosnia Herzegovina
+BK	Bosnia-Herzegovina
 BC	Botswana
 BV	Bouvet Island
 BR	Brazil
