@@ -3,7 +3,9 @@ import requests
 import urllib.parse
 from itertools import permutations, combinations
 
-FREQ_API_URL = 'https://article-search-api.herokuapp.com/api/searchTrends'
+FREQ_API_URL = 'http://127.0.0.1:5000/api/searchTrends'
+
+test = 'https://article-search-api.herokuapp.com/api/searchTrends'
 
 MAIN_IDS = [
     {'id': 'US'},
@@ -39,34 +41,86 @@ def allCombos():
 
     return combos
 
-def getArticleCounts(inQuery, startDate, startTime, endDate, endTime):
+def addReq(q, country, startDate, startTime, endDate, endTime):
+    req = []
+    req.append(q)
+    req.append(country)
+    req.append(startDate)
+    req.append(startTime)
+    req.append(endDate)
+    req.append(endTime)
+    return req
 
-    combos = allCombos()
+# gets all article counts for a specific query and combination of countries
+def buildArticleCountsReqs(inQuery, combos, startDate, startTime, endDate, endTime):
+
+    sourceCountries = readCountries()
+
+    allReqs = []
     
     for combo in combos:
-        query = f'{combo[0][1]} {combo[1][1]} ' + inQuery
+        query = f'\"{sourceCountries[combo[0]]}\" \"{sourceCountries[combo[1]]}\" ' + inQuery
+
+        for mId in MAIN_IDS:
+            req = addReq(query, mId, startDate, startTime, endDate, endTime)
+            allReqs.append(req)
+
+        if not (combo[0] in MAIN_COUNTRIES):
+            req = addReq(query, {'id': combo[0]}, startDate, startTime, endDate, endTime)
+            allReqs.append(req)
+
+        
+        if not (combo[1] in MAIN_COUNTRIES):
+            req = addReq(query, {'id': combo[1]}, startDate, startTime, endDate, endTime)
+            allReqs.append(req)
+    
+    payload = {}
+    payload['requestsSent'] = allReqs
+    encodedPayload = urllib.parse.urlencode()
+    finalURL = FREQ_API_URL + "?" + encodedPayload
+    resp = requests.get(finalURL)
+
+    if resp.status_code == 200:
+        data = resp.join()['results']
+    else:
+        print("ERROR")
+        print(query)
+        print(resp.content)
+        data = []
+
+    return allReqs
+
+def sendCountReqs(reqs, batchSize):
+    
+    batch = []
+    data = []
+
+    for req in reqs:
+        
+        batch.append(req)
+
+        if len(batch == batchSize):
+            payload = {}
+            payload['requestsSent'] = batch
+            resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
+            
+            if resp.status_code == 200:
+                responseResults = resp.json()["results"]
+                for res in responseResults:
+                    data.extend(res["articles"])
+            
+            batch = []
+    
+    if len(batch) > 0:
         payload = {}
-
-        reportingCountries = []
-        reportingCountries.extend(MAIN_IDS)
-
-        if not (combo[0][0] in MAIN_COUNTRIES):
-            reportingCountries.append({'id': combo[0][0]})
+        payload['requestsSent'] = batch
+        resp = requests.get(ARTICLE_SEARCH_API + "?" + urllib.parse.urlencode(payload))
         
-        if not (combo[1][0] in MAIN_COUNTRIES):
-            reportingCountries.append({'id': combo[1][0]})
-        
-        payload['countries'] = json.dumps(reportingCountries)
-        payload['q'] = json.dumps(query)
-        payload['startDate'] = json.dumps(startDate)
-        payload['startTime'] = json.dumps(startTime)
-        payload['endDate'] = json.dumps(endDate)
-        payload['endTime'] = json.dumps(endTime)
+        if resp.status_code == 200:
 
-        encodedPayload = urllib.parse.urlencode(payload)
-        finalURL = FREQ_API_URL + "?" + encodedPayload
-
-        resp = requests.get(finalURL)
-        data = resp.json()["results"]
-
+            # CHECK TO SEE THE FORMAT FOR THIS
+            responseResults = resp.json()["results"]
+            for res in responseResults:
+                data.extend(res)
+    
     return data
