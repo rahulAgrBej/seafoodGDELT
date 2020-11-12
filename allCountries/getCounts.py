@@ -5,7 +5,7 @@ import setup
 startDate = '01/01/2017'
 startTime = '00:00:00'
 
-endDate = '02/01/2017'
+endDate = '01/01/2018'
 endTime = '00:00:00'
 
 query = '(seafood OR fish OR crab OR shrimp)'
@@ -22,7 +22,7 @@ print("THIS IS THE DATA")
 print(data)
 
 outFolder = 'tmpDataStorage/'
-outF = '0_10.txt'
+outF = '0_1000.txt'
 f = open(os.path.join(outFolder, outF), 'w')
 f.write(json.dumps(data))
 f.close()
