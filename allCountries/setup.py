@@ -20,14 +20,16 @@ def readCountries():
 
     sourceCountries = {}
 
-    f = open('countryLookUp.txt', 'r')
+    f = open('countryLookUp.csv', 'r')
     data = f.readlines()
     f.close()
 
-    for country in data:
+    for country in data[1:]:
         country = country.rstrip('\n')
-        country = country.split('\t')
-        sourceCountries[country[0]] = ' '.join(country[1:])
+        country = country.split(',')
+
+        if int(country[-1]) == 0:
+            sourceCountries[country[0]] = country[1]
 
     return sourceCountries
 
