@@ -1,0 +1,274 @@
+Code,Country,Delete
+AF,Afghanistan,0
+AX,Akrotiri Sovereign Base Area,1
+AL,Albania,0
+AG,Algeria,0
+AQ,Samoa,0
+AN,Andorra,0
+AO,Angola,0
+AV,Anguilla,1
+AY,Antarctica,1
+AC,Antigua Barbuda,0
+AR,Argentina,0
+AM,Armenia,0
+AA,Aruba,0
+AT,Ashmore Cartier Islands,1
+AS,Australia,0
+AU,Austria,0
+AJ,Azerbaijan,0
+BF,Bahamas,0
+BA,Bahrain,0
+FQ,Baker Island,1
+BG,Bangladesh,0
+BB,Barbados,0
+BS,Bassas da India,1
+BO,Belarus,0
+BE,Belgium,0
+BH,Belize,0
+BN,Benin,0
+BD,Bermuda,0
+BT,Bhutan,0
+BL,Bolivia,0
+BK,Bosnia-Herzegovina,0
+BC,Botswana,0
+BV,Bouvet Island,1
+BR,Brazil,0
+IO,British Indian Ocean Territory,1
+VI,British Virgin Islands,1
+BX,Brunei,0
+BU,Bulgaria,0
+UV,Burkina Faso,0
+BY,Burundi,0
+CB,Cambodia,0
+CM,Cameroon,0
+CA,Canada,0
+CV,Cape Verde,0
+CJ,Cayman Islands,0
+CT,Central African Republic,0
+CD,Chad,0
+CI,Chile,0
+CH,China,0
+KT,Christmas Island,0
+IP,Clipperton Island,1
+CK,Cocos Keeling Islands,1
+CO,Colombia,0
+CN,Comoros,0
+CF,Congo,0
+CW,Cook Islands,0
+CR,Coral Sea Islands,1
+CS,Costa Rica,0
+IV,Cote d'Ivoire,0
+HR,Croatia,0
+CU,Cuba,0
+CY,Cyprus,0
+EZ,Czech Republic,0
+LO,Czechoslovakia,0
+CG,Congo,0
+DA,Denmark,0
+DX,Dhekelia Sovereign Base Area,1
+DJ,Djibouti,0
+DO,Dominica,0
+DR,Dominican Republic,0
+TT,East Timor,0
+EC,Ecuador,0
+EG,Egypt,0
+ES,El Salvador,0
+GV,Equatorial Guinea,
+EK,Equatorial Guinea,
+ER,Eritrea,0
+EN,Estonia,0
+ET,Ethiopia,0
+PJ,Etorofu Habomai Kunashiri and Shikotan Islands,1
+EU,Europa Island,1
+FK,Falkland Islands Islas Malvinas,1
+FO,Faroe Islands,1
+FJ,Fiji,0
+FI,Finland,0
+FR,France,0
+FG,French Guiana,0
+FP,French Polynesia,0
+FS,French Southern and Antarctic Lands,1
+GB,Gabon,0
+GA,Gambia,0
+GZ,Gaza Strip,0
+GG,Georgia,0
+GM,Germany,0
+GH,Ghana,0
+GI,Gibraltar,0
+GO,Glorioso Islands,1
+GR,Greece,0
+GL,Greenland,0
+GJ,Grenada,0
+GP,Guadeloupe,0
+GQ,Guam,0
+GT,Guatemala,0
+GK,Guernsey,1
+PU,Guinea-Bissau,0
+GY,Guyana,0
+HA,Haiti,0
+HM,Heard Island and McDonald Islands,1
+HO,Honduras,0
+HK,Hong Kong,0
+HQ,Howland Island,1
+HU,Hungary,0
+IC,Iceland,0
+IN,India,0
+ID,Indonesia,0
+IR,Iran,0
+IZ,Iraq,0
+EI,Ireland,0
+IM,Isle of Man,1
+IS,Israel,0
+IT,Italy,0
+JM,Jamaica,0
+JN,Jan Mayen,1
+JA,Japan,0
+DQ,Jarvis Island,1
+JE,Jersey,1
+JQ,Johnston Atoll,1
+JO,Jordan,0
+JU,Juan de Nova Island,1
+KZ,Kazakhstan,0
+KE,Kenya,0
+KQ,Kingman Reef,1
+KR,Kiribati,0
+KV,Kosovo,0
+KU,Kuwait,0
+KG,Kyrgyzstan,0
+LA,Laos,0
+LG,Latvia,0
+LE,Lebanon,0
+LT,Lesotho,0
+LI,Liberia,0
+LY,Libya,0
+LS,Liechtenstein,0
+LH,Lithuania,0
+LU,Luxembourg,0
+MC,Macau,0
+MK,Macedonia,0
+MA,Madagascar,0
+MI,Malawi,0
+MY,Malaysia,0
+MV,Maldives,0
+ML,Mali,0
+MT,Malta,0
+RM,Marshall Islands,0
+MB,Martinique,0
+MR,Mauritania,0
+MP,Mauritius,0
+MF,Mayotte,0
+MX,Mexico,0
+FM,Micronesia,0
+MQ,Midway Islands,1
+MD,Moldova,0
+MN,Monaco,0
+MG,Mongolia,0
+MJ,Montenegro,0
+MH,Montserrat,0
+MO,Morocco,0
+MZ,Mozambique,0
+BM,Myanmar,0
+WA,Namibia,0
+NR,Nauru,0
+BQ,Navassa Island,1
+NP,Nepal,0
+NL,Netherlands,0
+NT,Netherlands Antilles,0
+NC,New Caledonia,0
+NZ,New Zealand,0
+NU,Nicaragua,0
+NG,Niger,0
+NI,Nigeria,0
+NE,Niue,0
+NM,No Mans Land,1
+NF,Norfolk Island,1
+KN,North Korea,0
+CQ,Northern Mariana Islands,0
+NO,Norway,0
+OS,Oceans,1
+MU,Oman,0
+PK,Pakistan,0
+PS,Palau,0
+LQ,Palmyra Atoll,1
+PM,Panama,0
+PP,Papua New Guinea,0
+PF,Paracel Islands,1
+PA,Paraguay,0
+PE,Peru,0
+RP,Philippines,0
+PC,Pitcairn Islands,0
+PL,Poland,0
+PO,Portugal,0
+RQ,Puerto Rico,0
+QA,Qatar,0
+RE,Reunion,0
+RO,Romania,0
+RS,Russia,0
+RW,Rwanda,0
+SH,Saint Helena,1
+SC,Saint Kitts and Nevis,0
+ST,Saint Lucia,0
+RN,Saint Martin,0
+SB,Saint Pierre and Miquelon,0
+VC,Saint Vincent and the Grenadines,0
+TB,Saint-Barthelemy Island,1
+WS,Samoa,0
+SM,San Marino,0
+TP,Sao Tome and Principe,0
+SA,Saudi Arabia,0
+SG,Senegal,0
+RI,Serbia,0
+SE,Seychelles,0
+SL,Sierra Leone,0
+SN,Singapore,0
+SI,Slovenia,0
+BP,Solomon Islands,0
+SO,Somalia,0
+SF,South Africa,0
+SX,South Georgia and the South Sandwich Islands,1
+KS,South Korea,0
+OD,South Sudan,0
+SP,Spain,0
+PG,Spratly Islands,1
+CE,Sri Lanka,0
+SU,Sudan,0
+NS,Suriname,0
+SV,Svalbard,1
+WZ,Swaziland,0
+SW,Sweden,0
+SZ,Switzerland,0
+SY,Syria,0
+TW,Taiwan,0
+TI,Tajikistan,0
+TZ,Tanzania,0
+TH,Thailand,0
+TO,Togo,0
+TL,Tokelau,1
+TN,Tonga,0
+TD,Trinidad and Tobago,0
+TE,Tromelin Island,1
+TS,Tunisia,0
+TU,Turkey,0
+TX,Turkmenistan,0
+TK,Turks and Caicos Islands,0
+TV,Tuvalu,0
+UG,Uganda,0
+UP,Ukraine,0
+UF,Undersea Features,1
+AE,United Arab Emirates,0
+UK,United Kingdom,0
+US,United States,0
+UY,Uruguay,0
+UZ,Uzbekistan,0
+NH,Vanuatu,0
+VT,Vatican City,0
+VE,Venezuela,0
+VM,Vietnam,0
+VQ,Virgin Islands,0
+WQ,Wake Island,0
+WF,Wallis and Futuna,0
+WE,West Bank,0
+WI,Western Sahara,0
+YM,Yemen,0
+ZA,Zambia,0
+ZI,Zimbabwe,0
