@@ -94,15 +94,11 @@ def sendCountReqs(reqs, batchSize):
             
             if resp.status_code == 200:
                 responseResults = resp.json()["results"]
-                print("HERE SEND COUNTS TOp")
-                print(responseResults)
                 data.extend(responseResults)
             
             batch = []
     
-    print("GETS HERE")
     if len(batch) > 0:
-        print("GOES HERE")
         payload = {}
         payload['requestsSent'] = json.dumps(batch)
         resp = requests.get(FREQ_API_URL + "?" + urllib.parse.urlencode(payload))
@@ -111,8 +107,6 @@ def sendCountReqs(reqs, batchSize):
 
             # CHECK TO SEE THE FORMAT FOR THIS
             responseResults = resp.json()["results"]
-            print("HERE SEND COUNTS BOTTOM")
-            print(responseResults)
             data.extend(responseResults)
         else:
             print("ERROR ERRROR ERROR")
