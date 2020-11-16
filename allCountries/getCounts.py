@@ -32,11 +32,11 @@ for comboIdx in range(len(combos)):
 
 if (len(sendCombos) > 0):
     reqs = setup.buildArticleCountsReqs(query, sendCombos, startDate, startTime, endDate, endTime)
-        reqLimit = 15
-        data = setup.sendCountReqs(reqs, reqLimit)
-        outFolder = 'tmpDataStorage/'
-        outF = f'{str(len(combos)-1000)}_{str(len(combos))}.txt'
-        f = open(os.path.join(outFolder, outF), 'w')
-        f.write(json.dumps(data))
-        f.close()
-        print(f'{comboIdx} combinations searched for')
+    reqLimit = 15
+    data = setup.sendCountReqs(reqs, reqLimit)
+    outFolder = 'tmpDataStorage/'
+    outF = f'{str(len(combos)-1000)}_{str(len(combos))}.txt'
+    f = open(os.path.join(outFolder, outF), 'w')
+    f.write(json.dumps(data))
+    f.close()
+    print(f'{comboIdx} combinations searched for')
