@@ -10,7 +10,8 @@ endTime = '00:00:00'
 
 query = '(seafood OR fish OR crab OR shrimp)'
 
-combos = list(setup.allCombos())[26000:]
+combos = list(setup.allCombos())
+print(len(combos))
 
 sendCombos = []
 
