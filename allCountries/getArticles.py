@@ -2,11 +2,10 @@ import os
 import json
 import requests
 
-def makeReq(query, date):
-    
-    sourceCountry = query[-2:]
-    newQuery = query[-17:]
-    
+GDELT_REQ_LIMIT = 250
+
+def getDateTime(date):
+
     year = date[:4]
     month = date[4:6]
     day = date[6:8]
@@ -15,10 +14,23 @@ def makeReq(query, date):
     sec = date[12:]
 
     newDate = f'{month}/{day}/{year}'
-    startTime = '00:00:00'
-    endTime = '23:59:59'
+    newTime = f'{hour}:{mins}:{sec}'
 
-    req = [newQuery, {'id': sourceCountry}, newDate, startTime, newDate, endTime]
+    return newDate, newTime
+
+def getCurrDate(date):
+    return date['date'][:8] + date['date'][9:-1]
+
+
+def makeReq(query, startDate, endDate):
+    
+    sourceCountry = query[-2:]
+    newQuery = query[-17:]
+    
+    startDate, startTime = getDateTime(startDate)
+    endDate, endTime = getDateTime(endDate)
+
+    req = [newQuery, {'id': sourceCountry}, startDate, startTime, endDate, endTime]
 
     return req
 
@@ -37,22 +49,65 @@ for fName in dataFileNames:
 
 reqs = []
 count = 0
+startDate = ''
+prevDate = ''
 
 for entry in completeFreqData:
 
     # check if empty
     if len(entry['timeline']) > 0:
+
+        query = entry['query_details']['title']
+
         for date in entry['timeline'][0]['data']:
+
+            if startDate == '':
+                startDate = getCurrDate(date)
+            
             # check if date has more than 250
-            if date['value'] > 250:
-                query = entry['query_details']['title']
-                excessDate = date['date'][:8] + date['date'][9:-1]
-                excessReq.append([query, excessDate])
+            if date['value'] > GDELT_REQ_LIMIT:
+                endDate = prevDate
+                reqs.append(makeReq(query, startDate, endDate))
+
+
+                startDate = getCurrDate(date)
+                endDate = getCurrDate[-4:] + '235959'
+                reqs.append(makeReq(query, startDate, endDate))
+                count = 0
             else:
                 
-                if (count + date['value']) >= 250:
+                if (count + date['value']) == GDELT_REQ_LIMIT:
                     # make request
+                    endDate = getCurrDate(date)
+                    reqs.append(makeReq(query, startDate, endDate))
+                    count = 0
+                    
+                    # restart startDate
+                    startDate = ''
 
-                    pass
+                elif (count + date['value']) > GDELT_REQ_LIMIT:
+                    # make new request
+                    endDate = prevDate[:-4] + '235959'
+                    count = 0
+                    reqs.append(makeReq(query, startDate, endDate))
+
+                    # set new startDate
+                    startDate = getCurrDate(date)
+
                 else:
                     count += date['value']
+            
+            prevDate = getCurrDate(date)
+        
+        if count > 0:
+            # do the last req
+            endDate = getCurrDate(entry['timeline'][0]['data'][-1]['date'])
+            reqs.append(makeReq(query, startDate, endDate))
+            count = 0
+
+
+API_REQ_LIMIT = 15
+
+# request API requesters
+
+# write to CSV
