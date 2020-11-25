@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import pprint
 
 GDELT_REQ_LIMIT = 250
 
@@ -25,7 +26,7 @@ def getCurrDate(date):
 def makeReq(query, startDate, endDate):
     
     sourceCountry = query[-2:]
-    newQuery = query[-17:]
+    newQuery = query[:-17]
     
     startDate, startTime = getDateTime(startDate)
     endDate, endTime = getDateTime(endDate)
@@ -35,7 +36,7 @@ def makeReq(query, startDate, endDate):
     return req
 
 tmpDataFolder = 'tmpDataStorage/'
-dataFileNames = os.listdir(tmpDataFolder)
+dataFileNames = os.listdir(tmpDataFolder)[:2]
 
 completeFreqData = []
 
@@ -69,9 +70,8 @@ for entry in completeFreqData:
                 endDate = prevDate
                 reqs.append(makeReq(query, startDate, endDate))
 
-
                 startDate = getCurrDate(date)
-                endDate = getCurrDate[-4:] + '235959'
+                endDate = getCurrDate(date)[:-6] + '235959'
                 reqs.append(makeReq(query, startDate, endDate))
                 count = 0
             else:
@@ -101,12 +101,17 @@ for entry in completeFreqData:
         
         if count > 0:
             # do the last req
-            endDate = getCurrDate(entry['timeline'][0]['data'][-1]['date'])
+            endDate = getCurrDate(entry['timeline'][0]['data'][-1])
             reqs.append(makeReq(query, startDate, endDate))
             count = 0
+    
 
 
-API_REQ_LIMIT = 15
+printer = pprint.PrettyPrinter()
+print(len(reqs))
+printer.pprint(reqs)
+
+API_REQ_LIMIT = 1
 
 # request API requesters
 
