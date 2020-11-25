@@ -33,6 +33,22 @@ def readCountries():
 
     return sourceCountries
 
+def  country2Id():
+
+    countries = {}
+    f = open('countryLookUp.csv', 'r')
+    data = f.readlines()
+    f.close()
+
+    for country in data[1:]:
+        country = country.rstrip('\n')
+        country = country.split(',')
+
+        if int(country[-1]) == 0:
+            countries[country[1]] = country[0]
+    
+    return countries
+
 # returns all possible combos of sourceCountries
 def allCombos():
     combos = []
