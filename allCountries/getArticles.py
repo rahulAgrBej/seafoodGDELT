@@ -218,3 +218,5 @@ for fName in dataFileNames:
     f = open(outFileName, 'w')
     f.write(csvContent)
     f.close()
+
+    counter += 1
