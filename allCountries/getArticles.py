@@ -117,103 +117,104 @@ dataFileNames = os.listdir(tmpDataFolder)[:1]
 
 completeFreqData = []
 
+counter = 0
+
 for fName in dataFileNames:
     fPath = os.path.join(tmpDataFolder,fName)
     f = open(fPath, 'r')
     currData = json.loads(f.read())
     f.close()
 
-    completeFreqData.extend(currData)
+    reqs = []
+    count = 0
+    startDate = ''
+    prevDate = ''
 
-reqs = []
-count = 0
-startDate = ''
-prevDate = ''
+    for entry in currData:
 
-for entry in completeFreqData:
+        # check if empty
+        if len(entry['timeline']) > 0:
 
-    # check if empty
-    if len(entry['timeline']) > 0:
+            query = entry['query_details']['title']
 
-        query = entry['query_details']['title']
+            for date in entry['timeline'][0]['data']:
 
-        for date in entry['timeline'][0]['data']:
+                if startDate == '':
+                    startDate = getCurrDate(date)
+                
+                # check if date has more than 250
+                if date['value'] > GDELT_REQ_LIMIT:
+                    endDate = prevDate
+                    reqs.append(makeReq(query, startDate, endDate))
 
-            if startDate == '':
-                startDate = getCurrDate(date)
+                    startDate = getCurrDate(date)
+                    endDate = getCurrDate(date)[:-6] + '235959'
+                    reqs.append(makeReq(query, startDate, endDate))
+                    count = 0
+                else:
+                    
+                    if (count + date['value']) == GDELT_REQ_LIMIT:
+                        # make request
+                        endDate = getCurrDate(date)
+                        reqs.append(makeReq(query, startDate, endDate))
+                        count = 0
+                        
+                        # restart startDate
+                        startDate = ''
+
+                    elif (count + date['value']) > GDELT_REQ_LIMIT:
+                        # make new request
+                        endDate = prevDate[:-6] + '235959'
+                        count = 0
+                        reqs.append(makeReq(query, startDate, endDate))
+
+                        # set new startDate
+                        startDate = getCurrDate(date)
+
+                    else:
+                        count += date['value']
+                
+                prevDate = getCurrDate(date)
             
-            # check if date has more than 250
-            if date['value'] > GDELT_REQ_LIMIT:
-                endDate = prevDate
-                reqs.append(makeReq(query, startDate, endDate))
-
-                startDate = getCurrDate(date)
-                endDate = getCurrDate(date)[:-6] + '235959'
+            if count > 0:
+                # do the last req
+                endDate = getCurrDate(entry['timeline'][0]['data'][-1])
                 reqs.append(makeReq(query, startDate, endDate))
                 count = 0
-            else:
-                
-                if (count + date['value']) == GDELT_REQ_LIMIT:
-                    # make request
-                    endDate = getCurrDate(date)
-                    reqs.append(makeReq(query, startDate, endDate))
-                    count = 0
-                    
-                    # restart startDate
-                    startDate = ''
-
-                elif (count + date['value']) > GDELT_REQ_LIMIT:
-                    # make new request
-                    endDate = prevDate[:-6] + '235959'
-                    count = 0
-                    reqs.append(makeReq(query, startDate, endDate))
-
-                    # set new startDate
-                    startDate = getCurrDate(date)
-
-                else:
-                    count += date['value']
             
-            prevDate = getCurrDate(date)
+            startDate = ''
+            prevDate = ''
         
-        if count > 0:
-            # do the last req
-            endDate = getCurrDate(entry['timeline'][0]['data'][-1])
-            reqs.append(makeReq(query, startDate, endDate))
-            count = 0
-        
-        startDate = ''
-        prevDate = ''
-    
-#printer = pprint.PrettyPrinter()
-#print(len(reqs))
-#printer.pprint(reqs)
+    #printer = pprint.PrettyPrinter()
+    #print(len(reqs))
+    #printer.pprint(reqs)
 
-API_REQ_LIMIT = 10
+    API_REQ_LIMIT = 10
 
-batch = []
+    batch = []
 
-csvContent = 'country1,country2,sourceCountry,year,month,day,domain,title,url,social_image,language,query\n'
+    csvContent = 'country1,country2,sourceCountry,year,month,day,domain,title,url,social_image,language,query\n'
 
-for req in reqs:
+    for req in reqs:
 
-    batch.append(req)
+        batch.append(req)
 
-    if len(batch) == API_REQ_LIMIT:
-        # send batch over to API
-        responseData = sendBatch(batch)
-        if len(responseData) > 0:
-            csvContent += processResponse(responseData)
-        batch = []
+        if len(batch) == API_REQ_LIMIT:
+            # send batch over to API
+            responseData = sendBatch(batch)
+            if len(responseData) > 0:
+                csvContent += processResponse(responseData)
+            batch = []
 
 
-# edge case if there are any reqs left to be sent
-if len(batch) > 0:
-    # send batch
-    leftoverResponseData = sendBatch(batch)
-    if len(leftoverResponseData) > 0:
-        csvContent += processResponse(leftoverResponseData)
+    # edge case if there are any reqs left to be sent
+    if len(batch) > 0:
+        # send batch
+        leftoverResponseData = sendBatch(batch)
+        if len(leftoverResponseData) > 0:
+            csvContent += processResponse(leftoverResponseData)
 
-f = open('articleResults/2017_part0.csv', 'w')
-f.write(csvContent)
-f.close()
+    outFileName = f'articleResults/2017_part{str(counter)}.csv'
+    f = open(outFileName, 'w')
+    f.write(csvContent)
+    f.close()
