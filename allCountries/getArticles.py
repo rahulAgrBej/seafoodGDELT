@@ -113,7 +113,7 @@ def processResponse(data):
     return csvContent
 
 tmpDataFolder = 'tmpDataStorage2017/'
-dataFileNames = os.listdir(tmpDataFolder)[:1]
+dataFileNames = os.listdir(tmpDataFolder)
 
 completeFreqData = []
 
