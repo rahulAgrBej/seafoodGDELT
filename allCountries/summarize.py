@@ -15,7 +15,7 @@ args = argParser.parse_args()
 print(args)
 
 resultsFolder = 'articleResults/'
-resultsFiles = os.listdir(resultsFolder)[:1]
+resultsFiles = os.listdir(resultsFolder)
 
 def makeDateStr(year, month, day):
     date = str(year)
@@ -75,7 +75,7 @@ for fileName in resultsFiles:
                 continue
 
         if args.day != None:
-            if cells[5] != args.month:
+            if cells[5] != args.day:
                 continue
         
         summaryData += possRow + '\n'
