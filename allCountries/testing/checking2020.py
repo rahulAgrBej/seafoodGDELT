@@ -23,7 +23,42 @@ for fileName in articleFiles:
                 if data[3] == '2020':
                     inconsistentLines.append(line)
 
-pp = pprint.PrettyPrinter(indent=3)
-pp.pprint(inconsistentLines)
-print(len(inconsistentLines))
+# pp = pprint.PrettyPrinter(indent=3)
+# pp.pprint(inconsistentLines)
+# print(len(inconsistentLines))
 
+articlesCollected = []
+
+officialArticles2020 = os.listdir(folder2020)
+for officialFileName in officialArticles2020:
+    officialPath = os.path.join(folder2020, officialFileName)
+    f = open(officialPath, 'r')
+    data = f.read()
+    f.close()
+    data = data.split('\n')
+    for dataIdx in range(len(data))[1:]:
+        newLine = data[dataIdx].rstrip('\n')
+        newData = newLine.split(',')
+        data[dataIdx] = newData
+    articlesCollected.extend(data)
+
+
+
+print('looping to find articles within 2020 dataset')
+
+notFound = []
+found = False
+for inconsistentLine in inconsistentLines:
+    for ln in articlesCollected:
+        if ln[8] == inconsistentLine[8]:
+            found = True
+            print('found!')
+            break
+    
+    if not found:
+        print('NOT found!')
+        notFound.append(inconsistentLine)
+    
+    found = False
+
+print('finished!')
