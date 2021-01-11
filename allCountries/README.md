@@ -10,12 +10,12 @@ When completed you should now see a folder named articleResults. This is where a
 
 ## Filtering to specific article information
 
-**Get all article information**
-In your terminal run the command `python3 summarize.py`
+**Get all article information**  
+In your terminal run the command `python3 summarize.py`  
 You will now find a file called summary_table.csv with all the information you asked for.
 
-**Saving to a different file name**
-You can change the name of the output file run the command:
+**Saving to a different file name**  
+You can change the name of the output file run the command:  
 `python3 summarize.py -o [INSERT OUTPUT FILE NAME]`
 
 **Getting articles based on criteria**
