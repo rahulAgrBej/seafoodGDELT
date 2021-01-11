@@ -2,15 +2,16 @@ import concurrent.futures
 import requests
 from bs4 import BeautifulSoup
 
-test_url = 'https://www.undercurrentnews.com/2020/11/23/canadian-lobster-dock-prices-plummeted-weeks-before-dumping-day/'
+test_url = 'https://www.cnn.com/2020/12/04/politics/stimulus-negotiations-state-of-play/index.html'
 
 resp = requests.get(test_url)
 soup = BeautifulSoup(resp.content, 'html.parser')
 paragraphs = soup.find_all('p')
 
+print(paragraphs)
 for p in paragraphs:
-    print(p)
-
+    print(p.text)
+"""
 inputFilePath = ''
 f = open(inputFilePath, 'r')
 URLS = f.readlines()
@@ -51,3 +52,4 @@ for result in RESULTS:
 fOut = open('testingContentResults.csv', 'w')
 fOut.write(csvContent)
 fOut.close()
+"""
