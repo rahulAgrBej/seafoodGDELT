@@ -14,9 +14,14 @@ When completed you should now see a folder named articleResults. This is where a
 In your terminal run the command `python3 summarize.py`
 You will now find a file called summary_table.csv with all the information you asked for.
 
-**Getting articles based on criteria**
-*Getting articles that relate to ONE countries*
+**Saving to a different file name**
+You can change the name of the output file run the command:
+`python3 summarize.py -o [INSERT OUTPUT FILE NAME]`
 
+**Getting articles based on criteria**
+
+
+*Getting articles that relate to ONE countries*
 1. Find the country code of the country you are interested in countryLookUp.csv (eg US)
 2. Run the command `python3 summarize.py -c [INSERT COUNTRY CODE HERE]`
 
@@ -42,3 +47,7 @@ For example if I was interested in getting a table containing information on all
 For example if I was interested in getting a table containing information on all articles that were published my US sources I would type:
 `python3 summarize.py -s US`
 
+
+*Getting articles that were published on a specific date*
+1. Decide on a date (Note: you can ask for specific days, months or years)
+2. Run the command `python3 summarize.py -y [INSERT YEAR] -m [INSERT MONTH] -d [INSERT DAY]`
