@@ -1,6 +1,7 @@
 venv/
 testing/
 allCountries/testing/
+allCountries/articleResults/
 .Rproj.user
 .DS_Store
 __pycache__
