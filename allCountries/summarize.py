@@ -44,7 +44,10 @@ def getFullData():
 summaryData = ''
 
 for fileName in resultsFiles:
+    if fileName == '.DS_Store':
+        continue
     fullPath = os.path.join(resultsFolder, fileName)
+    print(fullPath)
     f = open(fullPath, 'r')
     rows = f.readlines()
     f.close()
