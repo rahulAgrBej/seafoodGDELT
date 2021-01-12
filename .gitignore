@@ -4,4 +4,6 @@ allCountries/testing/
 allCountries/articleResults/
 .Rproj.user
 .DS_Store
+allCountries/analysis_visualization/.RData
+allCountries/analysis_visualization/.Rhistory
 __pycache__
