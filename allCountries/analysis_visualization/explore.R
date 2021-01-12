@@ -24,7 +24,7 @@ for (row in 1:nrow(grouped_by_week)) {
   zerosFilledIn.n[currWeek] <- freq
 }
 
-g <- ggplot(articles %>% group_by(week) %>% tally(), aes(x = week,y = n)) +
+g <- ggplot(zerosFilledIn, aes(x = zerosFilledIn.week,y = zerosFilledIn.n)) +
   geom_line() +
   labs(y= "Number of Articles", x = "Week") +
   theme_minimal()
