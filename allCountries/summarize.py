@@ -81,9 +81,15 @@ for fileName in resultsFiles:
             if cells[5] != args.day:
                 continue
         
-        summaryData += possRow + '\n'
+        # this avoids including rows where the social image url has commas in it
+        insertRow = ''
+        for i in range(9):
+            insertRow += cells[i] + ','
+        insertRow = insertRow.rstrip(',')
+        summaryData += insertRow + '\n'
 
-summaryTable = 'country1,country2,sourceCountry,year,month,day,domain,title,url,social_image,language,query\n'
+summaryTable = 'country1,country2,sourceCountry,year,month,day,domain,title,url\n'
+#summaryTable = 'country1,country2,sourceCountry,year,month,day,domain,title,url,social_image,language,query\n'
 summaryTable += summaryData
 
 
