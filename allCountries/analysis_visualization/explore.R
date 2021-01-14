@@ -58,35 +58,27 @@ articles.getTimeSeries <- function(articleTable, startDate, freq) {
 }
 
 # Getting all the article tables
-articles2017 <- articles.getTable("../summary_US_CH.csv")
-articles2018 <- articles.getTable("../summary_US_CH_2018.csv")
-articles2019 <- articles.getTable("../summary_US_CH_2019.csv")
+articles2017 <- articles.getTable("data/US_CH_2017.csv")
+articles2018 <- articles.getTable("data/US_CH_2018.csv")
+articles2019 <- articles.getTable("data/US_CH_2019.csv")
+articles2020 <- articles.getTable("data/US_CH_2020.csv")
 
 # Turning tables into time series
 ts2017 <- articles.getTimeSeries(articles2017, 2017, 52)
 ts2018 <- articles.getTimeSeries(articles2018, 2018, 52)
 ts2019 <- articles.getTimeSeries(articles2019, 2019, 52)
+ts2020 <- articles.getTimeSeries(articles2020, 2020, 52)
 
 # Checking for shocks in the yearly time series
 shocks2017 <- shock.id(ts2017)
 shocks2018 <- shock.id(ts2018)
 shocks2019 <- shock.id(ts2019)
-
+shocks2020 <- shock.id(ts2020)
 
 # Creating a time series across multiple years
-ts2017_2019 <- ts(c(ts2017, ts2018), start=2017, frequency=52)
-ts2017_2020 <- ts(c(ts2017_2019, ts2019), start=2017, frequency=52)
+ts2017_2018 <- ts(c(ts2017, ts2018), start=2017, frequency=52)
+ts2017_2019 <- ts(c(ts2017_2018, ts2019), start=2017, frequency=52)
+ts2017_2020 <- ts(c(ts2017_2019, ts2020), start=2017, frequency=52)
 
-# Checking for shocks across 2017-2019
+# Checking for shocks across 2017-2020
 shocks2017_2020 <- shock.id(ts2017_2020)
-
-g <- ggplot(zerosFilledIn, aes(x = zerosFilledIn.week,y = zerosFilledIn.n)) +
-  geom_line() +
-  labs(y= "Number of Articles", x = "Week") +
-  theme_minimal()
-
-jpeg(filename = file.path("figs", "Summary_US_CH_2017.jpeg"), 
-     height = 3, width = 4, units ="in", res = 400)
-print(g)
-dev.off()
-
