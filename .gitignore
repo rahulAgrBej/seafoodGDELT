@@ -6,4 +6,5 @@ allCountries/articleResults/
 .DS_Store
 allCountries/analysis_visualization/.RData
 allCountries/analysis_visualization/.Rhistory
+allCountries/analysis_visualization/data/
 __pycache__
