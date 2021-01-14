@@ -33,23 +33,33 @@ articles.getTable <- function(filePath) {
         !(str_detect(domain, "oyetimes.com$"))) # remove irrelevant sources with high number of hits
   
   articles$week <- as.numeric(articles$week)
+  articles$month <- as.numeric(articles$month)
   
   return(articles)
 }
 
 articles.getTimeSeries <- function(articleTable, startDate, freq) {
-  grouped_by_week <- articleTable %>% group_by(week) %>% tally()
+  
+  if (freq == 52) {
+    grouped_data <- articleTable %>% group_by(week) %>% tally()
+  } else if (freq == 12) {
+    grouped_data <- articleTable %>% group_by(month) %>% tally()
+  }
   
   zerosFilledIn <- data.frame()
-  zerosFilledIn.week <- seq.int(1, 52)
-  zerosFilledIn.n <- rep(0, 52)
-  zerosFilledIn.n[4] <- 50
+  zerosFilledIn.date <- seq.int(1, freq)
+  zerosFilledIn.n <- rep(0, freq)
   
-  for (row in 1:nrow(grouped_by_week)) {
+  for (row in 1:nrow(grouped_data)) {
     
-    currWeek <- as.integer(grouped_by_week[row, "week"])
-    freq <- as.integer(grouped_by_week[row, "n"])
-    zerosFilledIn.n[currWeek] <- freq
+    if (freq == 52) {
+      currDate <- as.integer(grouped_data[row, "week"])
+    } else if (freq == 12) {
+      currDate <- as.integer(grouped_data[row, "month"])
+    }
+    
+    freqN <- as.integer(grouped_data[row, "n"])
+    zerosFilledIn.n[currDate] <- freqN
   }
   
   dataTS <- ts(zerosFilledIn.n, start=startDate, frequency=freq)
@@ -63,22 +73,52 @@ articles2018 <- articles.getTable("data/US_CH_2018.csv")
 articles2019 <- articles.getTable("data/US_CH_2019.csv")
 articles2020 <- articles.getTable("data/US_CH_2020.csv")
 
-# Turning tables into time series
-ts2017 <- articles.getTimeSeries(articles2017, 2017, 52)
-ts2018 <- articles.getTimeSeries(articles2018, 2018, 52)
-ts2019 <- articles.getTimeSeries(articles2019, 2019, 52)
-ts2020 <- articles.getTimeSeries(articles2020, 2020, 52)
+# Frequency for time series
+freq_week <- 52
+freq_month <- 12
 
-# Checking for shocks in the yearly time series
-shocks2017 <- shock.id(ts2017)
-shocks2018 <- shock.id(ts2018)
-shocks2019 <- shock.id(ts2019)
-shocks2020 <- shock.id(ts2020)
+# Turning tables into time series divided by week
+ts2017_weeks <- articles.getTimeSeries(articles2017, 2017, freq_week)
+ts2018_weeks <- articles.getTimeSeries(articles2018, 2018, freq_week)
+ts2019_weeks <- articles.getTimeSeries(articles2019, 2019, freq_week)
+ts2020_weeks <- articles.getTimeSeries(articles2020, 2020, freq_week)
 
-# Creating a time series across multiple years
-ts2017_2018 <- ts(c(ts2017, ts2018), start=2017, frequency=52)
-ts2017_2019 <- ts(c(ts2017_2018, ts2019), start=2017, frequency=52)
-ts2017_2020 <- ts(c(ts2017_2019, ts2020), start=2017, frequency=52)
+# Turning tables into time series divided by month
+ts2017_months <- articles.getTimeSeries(articles2017, 2017, freq_month)
+ts2018_months <- articles.getTimeSeries(articles2018, 2018, freq_month)
+ts2019_months <- articles.getTimeSeries(articles2019, 2019, freq_month)
+ts2020_months <- articles.getTimeSeries(articles2020, 2020, freq_month)
 
-# Checking for shocks across 2017-2020
-shocks2017_2020 <- shock.id(ts2017_2020)
+# Cook's D thresholds
+cooks_d_thresh_week <- 0.077
+cooks_d_thresh_month <- 0.333
+
+# Checking for shocks in the yearly time series (divided by week)
+shocks2017_weeks <- shock.id(ts2017_weeks, thresh=cooks_d_thresh_week)
+shocks2018_weeks <- shock.id(ts2018_weeks, thresh=cooks_d_thresh_week)
+shocks2019_weeks <- shock.id(ts2019_weeks, thresh=cooks_d_thresh_week)
+shocks2020_weeks <- shock.id(ts2020_weeks, thresh=cooks_d_thresh_week)
+
+# Checking for shocks in the yearly time series (divided by month)
+shocks2017_months <- shock.id(ts2017_months, thresh=cooks_d_thresh_month)
+shocks2018_months <- shock.id(ts2018_months, thresh=cooks_d_thresh_month)
+shocks2019_months <- shock.id(ts2019_months, thresh=cooks_d_thresh_month)
+shocks2020_months <- shock.id(ts2020_months, thresh=cooks_d_thresh_month)
+
+# Creating a time series across multiple years (divided by week)
+ts2017_2018_weeks <- ts(c(ts2017_weeks, ts2018_weeks), start=2017, frequency=freq_week)
+ts2017_2019_weeks <- ts(c(ts2017_2018_weeks, ts2019_weeks), start=2017, frequency=freq_week)
+ts2017_2020_weeks <- ts(c(ts2017_2019_weeks, ts2020_weeks), start=2017, frequency=freq_week)
+
+# Creating a time series across multiple years (divided by month)
+ts2017_2018_months <- ts(c(ts2017_weeks, ts2018_weeks), start=2017, frequency=freq_month)
+ts2017_2019_months <- ts(c(ts2017_2018_weeks, ts2019_weeks), start=2017, frequency=freq_month)
+ts2017_2020_months <- ts(c(ts2017_2019_weeks, ts2020_weeks), start=2017, frequency=freq_month)
+
+# Checking for shocks across 2017-2020 (divided by WEEK)
+multiyear_week_thresh <- 4 / (4 * 52)
+shocks2017_2020_weeks <- shock.id(ts2017_2020_weeks, thresh=multiyear_week_thresh)
+
+# Checking for shocks across 2017-2020 (divided by MONTH)
+multiyear_month_thresh <- 4 / (4 * 12)
+shocks2017_2020_months <- shock.id(ts2017_2020_months, thresh=multiyear_month_thresh)
