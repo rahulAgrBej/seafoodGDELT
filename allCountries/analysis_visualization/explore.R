@@ -44,6 +44,7 @@ articles.getTimeSeries <- function(articleTable, startDate, freq) {
     grouped_data <- articleTable %>% group_by(week) %>% tally()
   } else if (freq == 12) {
     grouped_data <- articleTable %>% group_by(month) %>% tally()
+    print(grouped_data)
   }
   
   zerosFilledIn <- data.frame()
@@ -85,9 +86,11 @@ ts2020_weeks <- articles.getTimeSeries(articles2020, 2020, freq_week)
 
 # Turning tables into time series divided by month
 ts2017_months <- articles.getTimeSeries(articles2017, 2017, freq_month)
+print(ts2017_months)
 ts2018_months <- articles.getTimeSeries(articles2018, 2018, freq_month)
 ts2019_months <- articles.getTimeSeries(articles2019, 2019, freq_month)
 ts2020_months <- articles.getTimeSeries(articles2020, 2020, freq_month)
+
 
 # Cook's D thresholds
 cooks_d_thresh_week <- 0.077
@@ -111,9 +114,11 @@ ts2017_2019_weeks <- ts(c(ts2017_2018_weeks, ts2019_weeks), start=2017, frequenc
 ts2017_2020_weeks <- ts(c(ts2017_2019_weeks, ts2020_weeks), start=2017, frequency=freq_week)
 
 # Creating a time series across multiple years (divided by month)
-ts2017_2018_months <- ts(c(ts2017_weeks, ts2018_weeks), start=2017, frequency=freq_month)
-ts2017_2019_months <- ts(c(ts2017_2018_weeks, ts2019_weeks), start=2017, frequency=freq_month)
-ts2017_2020_months <- ts(c(ts2017_2019_weeks, ts2020_weeks), start=2017, frequency=freq_month)
+ts2017_2018_months <- ts(c(ts2017_months, ts2018_months), start=2017, frequency=freq_month)
+ts2017_2019_months <- ts(c(ts2017_2018_months, ts2019_months), start=2017, frequency=freq_month)
+ts2017_2020_months <- ts(c(ts2017_2019_months, ts2020_months), start=2017, frequency=freq_month)
+
+ts.plot(ts2017_2020_months)
 
 # Checking for shocks across 2017-2020 (divided by WEEK)
 multiyear_week_thresh <- 4 / (4 * 52)
