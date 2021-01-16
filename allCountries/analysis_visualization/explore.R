@@ -44,7 +44,6 @@ articles.getTimeSeries <- function(articleTable, startDate, freq) {
     grouped_data <- articleTable %>% group_by(week) %>% tally()
   } else if (freq == 12) {
     grouped_data <- articleTable %>% group_by(month) %>% tally()
-    print(grouped_data)
   }
   
   zerosFilledIn <- data.frame()
