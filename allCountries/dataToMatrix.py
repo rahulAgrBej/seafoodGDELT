@@ -18,6 +18,7 @@ for idx in range(numCountries):
     countryMtrx.append([0] * numCountries)
 
 # creates country lookup dictionary
+countryList = []
 countryIdx = {}
 lineIdx = 0
 for line in countries:
@@ -27,11 +28,14 @@ for line in countries:
     countryIdx[country] = lineIdx
     lineIdx += 1
 
+    # creates a list of countries in order for future
+    countryList.append(country)
+
 # Build a n x n matrix where n = number of all countries being considered
 # all values inside the matrix should be 0 by default
 # matrix will be symmetrical
 
-dataFilePath = 'summary_table.csv'
+dataFilePath = 'analysis_visualization/data/summary_table_2017.csv'
 dataF = open(dataFilePath, 'r')
 dataCountries = dataF.readlines()
 dataF.close()
@@ -53,13 +57,18 @@ for row in dataCountries:
 
 # writes matrix into CSV file
 matrixCSV = ''
+for country in countryIdx.keys():
+    matrixCSV += country + ','
+
+matrixCSV = matrixCSV[:-1] + '\n'
+
 for counterRow in countryMtrx:
     for count in counterRow[:-1]:
         matrixCSV += str(count) + ','
     matrixCSV += str(counterRow[-1])
     matrixCSV += '\n'
 
-outFilePath = 'matrix.csv'
+outFilePath = 'analysis_visualization/data/matrix2017.csv'
 outF = open(outFilePath, 'w')
 outF.write(matrixCSV)
 outF.close()
