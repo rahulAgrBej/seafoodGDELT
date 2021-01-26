@@ -31,13 +31,13 @@ for line in countries:
 # all values inside the matrix should be 0 by default
 # matrix will be symmetrical
 
-dataFilePath = ''
+dataFilePath = 'summary_table.csv'
 dataF = open(dataFilePath, 'r')
 dataCountries = dataF.readlines()
-dataCountries.close()
+dataF.close()
 
 dataCountries = dataCountries[1:] # eliminates header row
-for row in rows:
+for row in dataCountries:
     row = row.rstrip('\n')
     cells = row.split(',')
     
@@ -51,3 +51,15 @@ for row in rows:
     countryMtrx[idxA][idxB] += 1
     countryMtrx[idxB][idxA] += 1
 
+# writes matrix into CSV file
+matrixCSV = ''
+for counterRow in countryMtrx:
+    for count in counterRow[:-1]:
+        matrixCSV += str(count) + ','
+    matrixCSV += str(counterRow[-1])
+    matrixCSV += '\n'
+
+outFilePath = 'matrix.csv'
+outF = open(outFilePath, 'w')
+outF.write(matrixCSV)
+outF.close()
