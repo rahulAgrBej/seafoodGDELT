@@ -57,7 +57,7 @@ for row in dataCountries:
 
 # writes matrix into CSV file
 matrixCSV = ''
-for country in countryIdx.keys():
+for country in countryList:
     matrixCSV += country + ','
 
 matrixCSV = matrixCSV[:-1] + '\n'
