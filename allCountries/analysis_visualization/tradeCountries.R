@@ -33,12 +33,12 @@ records.getFullCountryExports <- function(country) {
   countryExport20 <- records.getCountryExports(fp20, country)
   countryExportTotal <- rbind(countryExport17, countryExport18, countryExport19, countryExport20)
   
-  colnames(countryExportTotal) <- c('CTY_NAME', 'COUNTS_TRADE', 'MONTH', 'YEAR')
+  colnames(countryExportTotal) <- c('CTY_NAME', 'COUNTS', 'MONTH', 'YEAR')
   
   return(countryExportTotal)
 }
 
-# Get all news article records for a specific country
+# Get all news article records for a specific country fo a specific year
 records.getCountryNewsCounts <- function(fp, country, year) {
   countryArticles <- read_csv(fp)
   countryArticles <- countryArticles %>%
@@ -54,7 +54,7 @@ records.getCountryNewsCounts <- function(fp, country, year) {
     monthCounts <- rbind(monthCounts, c(row, 0, year))
   }
   
-  colnames(monthCounts) <- c('MONTH', 'COUNTS_NEWS', 'YEAR')
+  colnames(monthCounts) <- c('MONTH', 'COUNTS', 'YEAR')
   
   for (newRow in 1:nrow(countryArticles)) {
     idx <- as.integer(countryArticles[newRow, 'month'])
@@ -65,6 +65,7 @@ records.getCountryNewsCounts <- function(fp, country, year) {
   return(monthCounts)
 }
 
+# Gets news article records for 2017-2020 for a specific country
 records.getFullCountryNewsCounts <- function(country) {
   fp17 <- 'data/summary_table_2017.csv'
   fp18 <- 'data/summary_table_2018.csv'
@@ -79,27 +80,24 @@ records.getFullCountryNewsCounts <- function(country) {
   return(countryNewsCounts)
 }
 
-
+# Example with Chile
 chileTrades <- records.getFullCountryExports('CHILE')
+tradeRows <- nrow(chileTrades)
+tradeKindCol <- rep(c('TRADE'), times=tradeRows)
+tradeKindDF <- data.frame(tradeKindCol)
+colnames(tradeKindDF) <- c('KIND')
+chileTrades <- cbind(chileTrades, tradeKindDF)
+
 chileNews <- records.getFullCountryNewsCounts('CI')
+newsRows <- nrow(chileNews)
+newsKindCol <- rep(c('NEWS'), times=newsRows)
+newsKindDF <- data.frame(newsKindCol)
+colnames(newsKindDF) <- c('KIND')
+chileNews <- cbind(chileNews, newsKindDF)
 
-chile <- chileTrades %>% left_join(chileNews, by=c('MONTH', 'YEAR'))
-
-
-
-# chileNewsCounts <- records.getFullCountryNewsCounts('TH')
-# pNews <- ggplot(chileNewsCounts, aes(x=Month, y=Counts)) +
-#   geom_line() +
-#   geom_line(data=chileExports, aes(x=MONTH, y=ALL_VAL_MO), color="red") +
-#   scale_x_continuous(breaks=seq(1,48,by=1)) +
-#   labs(x="Months", y="Article Frequency") +
-#   facet_wrap(~YEAR)
-# plot(pNews)
-
-# 
-# p <- ggplot(chileExports, aes(x=MONTH, y=ALL_VAL_MO)) +
-#   geom_line() +
-#   scale_x_continuous(breaks=seq(1,48,by=1)) +
-#   labs(x='Months', y='Export Counts') +
-#   facet_wrap(~YEAR)
-# plot(p)
+p <- ggplot() +
+  geom_line(data=chileNews, aes(MONTH, COUNTS), color="red") +
+  geom_line(data=chileTrades, aes(MONTH, COUNTS), color="blue") +
+  scale_x_continuous(breaks=seq(1,48,by=1)) +
+  facet_grid(KIND~YEAR,scales="free_y")
+plot(p)
