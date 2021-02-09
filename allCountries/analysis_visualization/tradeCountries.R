@@ -36,7 +36,7 @@ records.getFullCountryExports <- function(country) {
 }
 
 # Get all news article records for a specific country
-records.getCountryNewsCounts <- function(fp, country) {
+records.getCountryNewsCounts <- function(fp, country, year) {
   countryArticles <- read_csv(fp)
   countryArticles <- countryArticles %>%
     filter(
@@ -44,22 +44,14 @@ records.getCountryNewsCounts <- function(fp, country) {
         (str_detect(country1, country) & str_detect(country2, 'US'))
     ) %>% group_by(month) %>% tally()
   
-  print(countryArticles)
-  
   monthCounts <- data.frame()
-  monthCounts.month <- seq.int(1, 12)
-  monthCounts.counts <- rep(0, 12)
-  
-  print(monthCounts)
   
   for (row in 1:12) {
-    #idx <- as.integer(countryArticles[row, 'month'])
-    #count <- as.integer(countryArticles[row, 'n'])
     
-    monthCounts <- rbind(monthCounts, c(row, 0))
+    monthCounts <- rbind(monthCounts, c(row, 0, year))
   }
   
-  colnames(monthCounts) <- c('Month', 'Counts')
+  colnames(monthCounts) <- c('Month', 'Counts', 'Year')
   
   for (newRow in 1:nrow(countryArticles)) {
     idx <- as.integer(countryArticles[newRow, 'month'])
@@ -70,14 +62,28 @@ records.getCountryNewsCounts <- function(fp, country) {
   return(monthCounts)
 }
 
-# monthCounts <- data.frame(matrix(ncol = 2, nrow = 0))
-# 
-# monthCounts <- rbind(monthCounts, c(1, 10))
-# monthCounts <- rbind(monthCounts, c(2, 30))
-# colnames(monthCounts) <- c('Month', 'Counts')
+records.getFullCountryNewsCounts <- function(country) {
+  fp17 <- 'data/summary_table_2017.csv'
+  fp18 <- 'data/summary_table_2018.csv'
+  fp19 <- 'data/summary_table_2019.csv'
+  fp20 <- 'data/summary_table_2020.csv'
+  countryNewsCounts17 <- records.getCountryNewsCounts(fp17, country, 2017)
+  countryNewsCounts18 <- records.getCountryNewsCounts(fp18, country, 2018)
+  countryNewsCounts19 <- records.getCountryNewsCounts(fp19, country, 2019)
+  countryNewsCounts20 <- records.getCountryNewsCounts(fp20, country, 2020)
+  countryNewsCounts <- rbind(countryNewsCounts17, countryNewsCounts18, countryNewsCounts19, countryNewsCounts20)
+  
+  return(countryNewsCounts)
+}
 
 
-chile17 <- records.getCountryNewsCounts('data/summary_table_2017.csv', 'CI')
+chileNewsCounts <- records.getFullCountryNewsCounts('TH')
+pNews <- ggplot(chileNewsCounts, aes(x=Month, y=Counts)) +
+  geom_line() +
+  scale_x_continuous(breaks=seq(1,48,by=1)) +
+  labs(x="Months", y="Article Frequency") +
+  facet_wrap(~Year)
+plot(pNews)
 
 # chileExports <- records.getFullCountryExports('CHILE')
 # p <- ggplot(chileExports, aes(x=MONTH, y=ALL_VAL_MO)) +
