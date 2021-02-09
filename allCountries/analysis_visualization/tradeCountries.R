@@ -1,5 +1,6 @@
 library(tidyverse)
 library(ggplot2)
+library(dplyr)
 
 # Analyzing trades with the US
 
@@ -32,6 +33,8 @@ records.getFullCountryExports <- function(country) {
   countryExport20 <- records.getCountryExports(fp20, country)
   countryExportTotal <- rbind(countryExport17, countryExport18, countryExport19, countryExport20)
   
+  colnames(countryExportTotal) <- c('CTY_NAME', 'COUNTS_TRADE', 'MONTH', 'YEAR')
+  
   return(countryExportTotal)
 }
 
@@ -51,7 +54,7 @@ records.getCountryNewsCounts <- function(fp, country, year) {
     monthCounts <- rbind(monthCounts, c(row, 0, year))
   }
   
-  colnames(monthCounts) <- c('Month', 'Counts', 'Year')
+  colnames(monthCounts) <- c('MONTH', 'COUNTS_NEWS', 'YEAR')
   
   for (newRow in 1:nrow(countryArticles)) {
     idx <- as.integer(countryArticles[newRow, 'month'])
@@ -77,15 +80,23 @@ records.getFullCountryNewsCounts <- function(country) {
 }
 
 
-chileNewsCounts <- records.getFullCountryNewsCounts('TH')
-pNews <- ggplot(chileNewsCounts, aes(x=Month, y=Counts)) +
-  geom_line() +
-  scale_x_continuous(breaks=seq(1,48,by=1)) +
-  labs(x="Months", y="Article Frequency") +
-  facet_wrap(~Year)
-plot(pNews)
+chileTrades <- records.getFullCountryExports('CHILE')
+chileNews <- records.getFullCountryNewsCounts('CI')
 
-# chileExports <- records.getFullCountryExports('CHILE')
+chile <- chileTrades %>% left_join(chileNews, by=c('MONTH', 'YEAR'))
+
+
+
+# chileNewsCounts <- records.getFullCountryNewsCounts('TH')
+# pNews <- ggplot(chileNewsCounts, aes(x=Month, y=Counts)) +
+#   geom_line() +
+#   geom_line(data=chileExports, aes(x=MONTH, y=ALL_VAL_MO), color="red") +
+#   scale_x_continuous(breaks=seq(1,48,by=1)) +
+#   labs(x="Months", y="Article Frequency") +
+#   facet_wrap(~YEAR)
+# plot(pNews)
+
+# 
 # p <- ggplot(chileExports, aes(x=MONTH, y=ALL_VAL_MO)) +
 #   geom_line() +
 #   scale_x_continuous(breaks=seq(1,48,by=1)) +
