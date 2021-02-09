@@ -35,10 +35,23 @@ records.getFullCountryExports <- function(country) {
   return(countryExportTotal)
 }
 
-chileExports <- records.getFullCountryExports('CHILE')
-p <- ggplot(chileExports, aes(x=MONTH, y=ALL_VAL_MO)) +
-  geom_line() +
-  scale_x_continuous(breaks=seq(1,48,by=1)) +
-  labs(x='Months', y='Export Counts') +
-  facet_wrap(~YEAR)
-plot(p)
+# Get all news article records for a specific country
+records.getCountryArticles <- function(fp, country) {
+  countryArticles <- read_csv(fp)
+  countryArticles <- countryArticles %>%
+    filter(
+      (str_detect(country1, 'US') & str_detect(country2, country)) |
+        (str_detect(country1, country) & str_detect(country2, 'US'))
+    )
+  return(countryArticles)
+}
+
+chile17 <- records.getCountryArticles('data/summary_table_2017.csv', 'CI')
+
+# chileExports <- records.getFullCountryExports('CHILE')
+# p <- ggplot(chileExports, aes(x=MONTH, y=ALL_VAL_MO)) +
+#   geom_line() +
+#   scale_x_continuous(breaks=seq(1,48,by=1)) +
+#   labs(x='Months', y='Export Counts') +
+#   facet_wrap(~YEAR)
+# plot(p)
