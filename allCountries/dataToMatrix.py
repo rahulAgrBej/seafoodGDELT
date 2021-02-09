@@ -51,9 +51,10 @@ for row in dataCountries:
     idxA = countryIdx[countryA]
     idxB = countryIdx[countryB]
 
-    # adds to counter for each part of the matrix b/c it is symmetrical
-    countryMtrx[idxA][idxB] += 1
-    countryMtrx[idxB][idxA] += 1
+    if not (idxA == idxB):
+        # adds to counter for each part of the matrix b/c it is symmetrical
+        countryMtrx[idxA][idxB] += 1
+        countryMtrx[idxB][idxA] += 1
 
 # writes matrix into CSV file
 matrixCSV = ''

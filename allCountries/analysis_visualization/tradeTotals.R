@@ -24,21 +24,25 @@ exports2020 <- trades.cleanExports('data/trades/exports2020.csv')
 
 p17 <- ggplot(exports2017, aes(x = MONTH, y = ALL_VAL_MO)) +
   geom_line() +
+  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
   labs(y = 'Trade Quantity', x = 'Month') +
   theme_minimal()
 
 p18 <- ggplot(exports2018, aes(x = MONTH, y = ALL_VAL_MO)) +
   geom_line() +
+  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
   labs(y = 'Trade Quantity', x = 'Month') +
   theme_minimal()
 
 p19 <- ggplot(exports2019, aes(x = MONTH, y = ALL_VAL_MO)) +
   geom_line() +
+  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
   labs(y = 'Trade Quantity', x = 'Month') +
   theme_minimal()
 
 p20 <- ggplot(exports2020, aes(x = MONTH, y = ALL_VAL_MO)) +
   geom_line() +
+  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
   labs(y = 'Trade Quantity', x = 'Month') +
   theme_minimal()
 
