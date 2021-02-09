@@ -1,6 +1,5 @@
 library(tidyverse)
 library(ggplot2)
-library(cowplot)
 
 trades.cleanExports <- function(fp) {
   exports <- read_csv(fp)
@@ -17,34 +16,17 @@ trades.cleanExports <- function(fp) {
   return(exports)
 }
 
-exports2017 <- trades.cleanExports('data/trades/exports2017.csv')
-exports2018 <- trades.cleanExports('data/trades/exports2018.csv')
-exports2019 <- trades.cleanExports('data/trades/exports2019.csv')
-exports2020 <- trades.cleanExports('data/trades/exports2020.csv')
+exports2017 <- trades.cleanExports('data/trades/totals/exports2017.csv')
+exports2018 <- trades.cleanExports('data/trades/totals/exports2018.csv')
+exports2019 <- trades.cleanExports('data/trades/totals/exports2019.csv')
+exports2020 <- trades.cleanExports('data/trades/totals/exports2020.csv')
+exportsTotal <- rbind(exports2017, exports2018, exports2019, exports2020)
 
-p17 <- ggplot(exports2017, aes(x = MONTH, y = ALL_VAL_MO)) +
+p <- ggplot(exportsTotal, aes(x = MONTH, y = ALL_VAL_MO)) +
   geom_line() +
-  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
+  scale_x_continuous(breaks = seq(1, 48, by = 1)) +
   labs(y = 'Trade Quantity', x = 'Month') +
-  theme_minimal()
+  theme_minimal() +
+  facet_wrap(~YEAR)
 
-p18 <- ggplot(exports2018, aes(x = MONTH, y = ALL_VAL_MO)) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
-  labs(y = 'Trade Quantity', x = 'Month') +
-  theme_minimal()
-
-p19 <- ggplot(exports2019, aes(x = MONTH, y = ALL_VAL_MO)) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
-  labs(y = 'Trade Quantity', x = 'Month') +
-  theme_minimal()
-
-p20 <- ggplot(exports2020, aes(x = MONTH, y = ALL_VAL_MO)) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(1, 12, by = 1)) +
-  labs(y = 'Trade Quantity', x = 'Month') +
-  theme_minimal()
-
-plot_grid(p17, p18, p19, p20)
-
+plot(p)
