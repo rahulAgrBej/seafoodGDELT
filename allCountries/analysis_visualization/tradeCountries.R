@@ -1,11 +1,11 @@
 source('helpers.R')
 
 
-chileP <- tradeNewsPlots('CHILE', 'CI')
-plot(chileP)
-
 norwayP <- tradeNewsPlots('NORWAY', 'NO')
 plot(norwayP)
+
+chileP <- tradeNewsPlots('CHILE', 'CI')
+plot(chileP)
 
 canadaP <- tradeNewsPlots('CANADA', 'CA')
 plot(canadaP)

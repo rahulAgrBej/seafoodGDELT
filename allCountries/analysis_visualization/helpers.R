@@ -130,38 +130,54 @@ records.getFullCountryNewsCounts <- function(country) {
   return(countryNewsCounts)
 }
 
+completeData <- function(data, kind) {
+  tradeRows <- nrow(data)
+  tradeKindCol <- rep(c(kind), times=tradeRows)
+  tradeKindDF <- data.frame(tradeKindCol)
+  colnames(tradeKindDF) <- c('KIND')
+  data <- cbind(data, tradeKindDF)
+  shocks <- shock.id(data$COUNT)
+  shocks <- data.frame(shocks$shock.event)
+  colnames(shocks) <- c('SHOCK')
+  data <- cbind(data, shocks)
+  data$MONTH <- seq(1,48)
+  data <- subset(data, select=c('MONTH', 'COUNTS', 'KIND', 'SHOCK'))
+  
+  return(data)
+}
+
 tradeNewsPlots <- function(countryName, countryCode) {
   # Example with data
   dataExport <- records.getFullCountryExports(countryName)
-  tradeRows <- nrow(dataExport)
-  tradeKindCol <- rep(c('EXPORTS'), times=tradeRows)
-  tradeKindDF <- data.frame(tradeKindCol)
-  colnames(tradeKindDF) <- c('KIND')
-  dataExport <- cbind(dataExport, tradeKindDF)
+  dataExport <- completeData(dataExport, 'EXPORTS')
   
   # Example with data
   dataImport <- records.getFullCountryImports(countryName)
-  tradeRows <- nrow(dataImport)
-  tradeKindCol <- rep(c('IMPORTS'), times=tradeRows)
-  tradeKindDF <- data.frame(tradeKindCol)
-  colnames(tradeKindDF) <- c('KIND')
-  dataImport <- cbind(dataImport, tradeKindDF)
+  dataImport <- completeData(dataImport, 'IMPORTS')
   
   dataNews <- records.getFullCountryNewsCounts(countryCode)
-  newsRows <- nrow(dataNews)
-  newsKindCol <- rep(c('NEWS'), times=newsRows)
-  newsKindDF <- data.frame(newsKindCol)
-  colnames(newsKindDF) <- c('KIND')
-  dataNews <- cbind(dataNews, newsKindDF)
+  dataNews <- completeData(dataNews, 'NEWS')
+  
+  dataComplete <- rbind(dataNews, dataImport, dataExport)
+  
+  exportShocks = which(subset(dataComplete, KIND=='EXPORTS')$SHOCK == 1)
+  importShocks = which(subset(dataComplete, KIND=='IMPORTS')$SHOCK == 1)
+  newsShocks = which(subset(dataComplete, KIND=='NEWS')$SHOCK == 1)
+  print(subset(dataComplete, KIND=='EXPORTS'))
+  print(exportShocks)
+  print(importShocks)
   
   p <- ggplot() +
     ggtitle(countryName) +
-    geom_line(data=dataNews, aes(MONTH, COUNTS), color="red") +
-    geom_line(data=dataExport, aes(MONTH, COUNTS), color="blue") +
-    geom_line(data=dataImport, aes(MONTH, COUNTS), color="black") +
+    facet_grid(rows=vars(KIND), scales='free_y') +
     scale_x_continuous(breaks=seq(1,48,by=1)) +
-    facet_grid(KIND~YEAR,scales="free_y")
-  
+    geom_line(data=subset(dataComplete, KIND='NEWS'), aes(MONTH, COUNTS), color='red') +
+    geom_line(data=subset(dataComplete, KIND='EXPORTS'), aes(MONTH, COUNTS), color='blue') +
+    geom_line(data=subset(dataComplete, KIND='IMPORTS'), aes(MONTH, COUNTS), color='black') +
+    #geom_vline(xintercept=newsShocks, color='red') +
+    geom_vline(xintercept=exportShocks, color='green') +
+    geom_vline(xintercept=importShocks, color='red')
+    
   return(p)
 }
 
