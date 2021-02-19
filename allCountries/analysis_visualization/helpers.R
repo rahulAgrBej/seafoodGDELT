@@ -130,6 +130,41 @@ records.getFullCountryNewsCounts <- function(country) {
   return(countryNewsCounts)
 }
 
+tradeNewsPlots <- function(countryName, countryCode) {
+  # Example with data
+  dataExport <- records.getFullCountryExports(countryName)
+  tradeRows <- nrow(dataExport)
+  tradeKindCol <- rep(c('EXPORTS'), times=tradeRows)
+  tradeKindDF <- data.frame(tradeKindCol)
+  colnames(tradeKindDF) <- c('KIND')
+  dataExport <- cbind(dataExport, tradeKindDF)
+  
+  # Example with data
+  dataImport <- records.getFullCountryImports(countryName)
+  tradeRows <- nrow(dataImport)
+  tradeKindCol <- rep(c('IMPORTS'), times=tradeRows)
+  tradeKindDF <- data.frame(tradeKindCol)
+  colnames(tradeKindDF) <- c('KIND')
+  dataImport <- cbind(dataImport, tradeKindDF)
+  
+  dataNews <- records.getFullCountryNewsCounts(countryCode)
+  newsRows <- nrow(dataNews)
+  newsKindCol <- rep(c('NEWS'), times=newsRows)
+  newsKindDF <- data.frame(newsKindCol)
+  colnames(newsKindDF) <- c('KIND')
+  dataNews <- cbind(dataNews, newsKindDF)
+  
+  p <- ggplot() +
+    ggtitle(countryName) +
+    geom_line(data=dataNews, aes(MONTH, COUNTS), color="red") +
+    geom_line(data=dataExport, aes(MONTH, COUNTS), color="blue") +
+    geom_line(data=dataImport, aes(MONTH, COUNTS), color="black") +
+    scale_x_continuous(breaks=seq(1,48,by=1)) +
+    facet_grid(KIND~YEAR,scales="free_y")
+  
+  return(p)
+}
+
 shocksImports <- function(countryName) {
   imports <- records.getFullCountryImports(countryName)
   shocks <- shock.id(imports$COUNTS)
