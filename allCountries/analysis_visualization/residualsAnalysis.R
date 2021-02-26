@@ -45,25 +45,24 @@ getInfo <- function(country) {
   news$MONTH_IDX <- seq(1, nrow(news))
   
   complete <- rbind(exports, imports, news)
-  print(complete)
-  
+
   return(complete)
 }
 
 relevantCountries <- read_csv('data/relevantCountries.csv')
-country <- relevantCountries[1,]
-countryInfo <- getInfo(country)
 
-p <- countryInfo %>%
-  ggplot() +
-  ggtitle(country$name) +
-  geom_line(aes(x=MONTH_IDX, y=COUNT_PLOT)) +
-  scale_x_continuous(breaks=seq(1,nrow(countryInfo)/3,by=1)) +
-  facet_grid(rows=vars(TYPE), scales='free_y') 
-
-plot(p)
-
-print(nrow(countryInfo))
+for (idx in 1:nrow(relevantCountries)) {
+  country <- relevantCountries[idx,]
+  countryInfo <- getInfo(country)
+  p <- countryInfo %>%
+    ggplot() +
+    ggtitle(country$name) +
+    geom_line(aes(x=MONTH_IDX, y=COUNT_PLOT)) +
+    scale_x_continuous(breaks=seq(1,nrow(countryInfo)/3,by=1)) +
+    facet_grid(rows=vars(TYPE), scales='free_y') 
+  
+  plot(p)
+}
 
 
 # Get all residuals for exports
