@@ -2,11 +2,11 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 
-shock.id <- function(dat, thresh=0.35){
+shock.id <- function(dat, thresh=0.25){
   # dat is your time series data and threshold is the threshold you want for Cook's D (defaulted to 0.35)
   outt <- array(dim=c(length(dat), 3))
   x <- 1:length(dat)
-  ll <- lowess(x, dat) # Fits lowess curve (can specify other options for how the curve is estimated and can change the span)
+  ll <- lowess(x, dat, f=(2/3)) # Fits lowess curve (can specify other options for how the curve is estimated and can change the span)
   rr <- as.numeric(dat[order(x)]-ll$y) #residuals off lowess
   rrp1 <- rr[2:length(rr)] # Residuals at time t
   rrm1 <- rr[1:(length(rr)-1)] # Residuals at time t-1
@@ -48,7 +48,7 @@ records.getCountryImports <- function(fp, country) {
   
   countryTrades$MONTH <- as.numeric(countryTrades$MONTH)
   countryTrades$YEAR <- as.numeric(countryTrades$YEAR)
-  countryTrades$ALL_VAL_MO <- as.numeric(countryTrades$GEN_VAL_MO)
+  countryTrades$GEN_VAL_MO <- as.numeric(countryTrades$GEN_VAL_MO)
   countryTrades <- subset(countryTrades, select=-c(CTY_CODE, SUMMARY_LVL, COMM_LVL, I_COMMODITY))
   
   return(countryTrades)
@@ -163,9 +163,6 @@ tradeNewsPlots <- function(countryName, countryCode) {
   exportShocks = which(subset(dataComplete, KIND=='EXPORTS')$SHOCK == 1)
   importShocks = which(subset(dataComplete, KIND=='IMPORTS')$SHOCK == 1)
   newsShocks = which(subset(dataComplete, KIND=='NEWS')$SHOCK == 1)
-  print(subset(dataComplete, KIND=='EXPORTS'))
-  print(exportShocks)
-  print(importShocks)
   
   p <- ggplot() +
     ggtitle(countryName) +
@@ -174,9 +171,9 @@ tradeNewsPlots <- function(countryName, countryCode) {
     geom_line(data=subset(dataComplete, KIND='NEWS'), aes(MONTH, COUNTS), color='red') +
     geom_line(data=subset(dataComplete, KIND='EXPORTS'), aes(MONTH, COUNTS), color='blue') +
     geom_line(data=subset(dataComplete, KIND='IMPORTS'), aes(MONTH, COUNTS), color='black') +
-    #geom_vline(xintercept=newsShocks, color='red') +
+    geom_vline(xintercept=newsShocks, color='blue') +
     geom_vline(xintercept=exportShocks, color='green') +
-    geom_vline(xintercept=importShocks, color='red')
+    geom_vline(xintercept=importShocks, color='red', linetype='dotted')
     
   return(p)
 }
