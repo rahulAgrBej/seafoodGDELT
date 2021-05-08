@@ -70,3 +70,10 @@ exportData <- exportData %>%
   group_by(CTY_NAME, MONTH, YEAR) %>%
   summarize(TOTAL = sum(QUANTITY)) %>%
   mutate(TOTAL = replace_na(TOTAL, 0))
+
+# WRITES INFO TO SEPARATE FILES FOR REFERENCE LATER
+importsOutPath <- 'data/processed/imports.csv'
+exportsOutPath <- 'data/processed/exports.csv'
+
+write_csv(importData, importsOutPath)
+write_csv(exportData, exportsOutPath)
