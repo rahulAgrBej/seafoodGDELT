@@ -24,6 +24,9 @@ for (yearIdx in 1:3) {
 completeCountries <- completeCountries %>%
   crossing(fullMonths)
 
+completeCountriesRefPath <- 'data/countryFiller.csv'
+write_csv(completeCountries, completeCountriesRefPath)
+
 
 # input files for imports and exports
 importsFilePath <- "data/level_hs_10/imports.csv"
