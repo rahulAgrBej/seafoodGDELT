@@ -72,8 +72,8 @@ exportData <- exportData %>%
   mutate(TOTAL = replace_na(TOTAL, 0))
 
 # WRITES INFO TO SEPARATE FILES FOR REFERENCE LATER
-importsOutPath <- 'data/processed/imports.csv'
-exportsOutPath <- 'data/processed/exports.csv'
+importsOutPath <- 'data/processed/original/imports.csv'
+exportsOutPath <- 'data/processed/original/exports.csv'
 
 write_csv(importData, importsOutPath)
 write_csv(exportData, exportsOutPath)
