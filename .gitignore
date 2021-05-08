@@ -9,3 +9,5 @@ allCountries/analysis_visualization/.Rhistory
 allCountries/analysis_visualization/data/
 allCountries/analysis_visualization/figs/
 __pycache__
+*.Rhistory
+*.Rproj
