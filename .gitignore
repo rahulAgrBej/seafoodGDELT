@@ -11,3 +11,4 @@ allCountries/analysis_visualization/figs/
 __pycache__
 *.Rhistory
 *.Rproj
+trade_and_news/data/processed/original/
