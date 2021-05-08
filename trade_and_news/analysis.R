@@ -49,3 +49,24 @@ importData <- importData %>%
   group_by(CTY_NAME, MONTH, YEAR) %>%
   summarize(TOTAL = sum(QUANTITY)) %>%
   mutate(TOTAL = replace_na(TOTAL, 0))
+
+# EXPORTS=========================================================================
+exportData <- read_csv(exportsFilePath)
+exportData <- exportData %>%
+  select(CTY_CODE, CTY_NAME, QTY_1_MO, DF, MONTH, SUMMARY_LVL, E_COMMODITY, YEAR) %>%
+  filter(str_detect(SUMMARY_LVL, 'DET')) %>%
+  filter(!str_detect(CTY_CODE, '-')) %>%
+  filter(str_detect(DF, '-')) %>%
+  select(CTY_CODE, CTY_NAME, QTY_1_MO, MONTH, E_COMMODITY, YEAR) %>%
+  rename(QUANTITY = QTY_1_MO, HS_CODE = E_COMMODITY) %>%
+  mutate(MONTH = as.numeric(MONTH))
+
+# make sure to have an entry for every country, month and year
+exportData <- exportData %>%
+  right_join(completeCountries)
+
+# aggregate all trade for all codes into one total value per month per country
+exportData <- exportData %>%
+  group_by(CTY_NAME, MONTH, YEAR) %>%
+  summarize(TOTAL = sum(QUANTITY)) %>%
+  mutate(TOTAL = replace_na(TOTAL, 0))
