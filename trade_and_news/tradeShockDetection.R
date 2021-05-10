@@ -20,7 +20,7 @@ shock.id <- function(dat, thresh=0.25){
 
 # finds shocks for trade data
 findTradeShocks <- function(tradeData, countryName) {
-  
+
   countryData <- tradeData %>%
     filter(str_detect(CTY_NAME, countryName)) %>%
     arrange(YEAR, MONTH)
@@ -30,8 +30,7 @@ findTradeShocks <- function(tradeData, countryName) {
     tradeShocks <- shock.id(countryData$TOTAL) %>%
       mutate(cooks.d = replace_na(cooks.d, 0)) %>%
       mutate(shock.event = replace_na(shock.event, 0))
-  }
-  else {
+  } else {
     # edge case there are no records for this country
     tradeShocks <- data.frame(
       cooks.d=rep(0, 48),
@@ -40,12 +39,19 @@ findTradeShocks <- function(tradeData, countryName) {
     )
   }
   
+  monthIndices <- data.frame(
+    'MONTH_IDX'=seq(1,48)
+  )
+  
+  tradeShocks <- tradeShocks %>%
+    cbind(monthIndices)
+  
   return(tradeShocks)
 }
 
 # Trade data file paths and retrieval (PROCESSED VERSION)
-importFilePath <- 'data/processed/original/imports.csv'
-exportFilePath <- 'data/processed/original/exports.csv'
+importFilePath <- 'data/trade/processed/original/imports.csv'
+exportFilePath <- 'data/trade/processed/original/exports.csv'
 
 importData <- read_csv(importFilePath)
 exportData <- read_csv(exportFilePath)
@@ -73,6 +79,8 @@ for (countryIdx in 1:nrow(countryList)) {
   
   print(countryTradeName)
   
+  countryTradeName <- paste('\\^', countryTradeName, '\\b', sep='')
+  
   # detecting and recording shocks in imports
   countryImportShocks <- findTradeShocks(importData, countryTradeName) %>%
     cbind(data.frame(
@@ -93,8 +101,8 @@ for (countryIdx in 1:nrow(countryList)) {
 }
 
 # write all trade shock data to output files
-importShockPath <- 'data/processed/original/importShocks.csv'
-exportShockPath <- 'data/processed/original/exportShocks.csv'
+importShockPath <- 'data/trade/processed/original/importShocks.csv'
+exportShockPath <- 'data/trade/processed/original/exportShocks.csv'
 
 write_csv(importShocks, importShockPath)
 write_csv(exportShocks, exportShockPath)
