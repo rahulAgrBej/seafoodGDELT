@@ -23,6 +23,7 @@ findTradeShocks <- function(tradeData, countryName) {
 
   countryData <- tradeData %>%
     filter(str_detect(CTY_NAME, countryName)) %>%
+    filter(str_length(CTY_NAME) == str_length(countryName)) %>%
     arrange(YEAR, MONTH)
   
   if (nrow(countryData) > 0) {
@@ -79,10 +80,8 @@ for (countryIdx in 1:nrow(countryList)) {
   
   print(countryTradeName)
   
-  countryTradeNameSearch <- paste('\\^', countryTradeName, '\\b', sep='')
-  
   # detecting and recording shocks in imports
-  countryImportShocks <- findTradeShocks(importData, countryTradeNameSearch) %>%
+  countryImportShocks <- findTradeShocks(importData, countryTradeName) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
@@ -91,7 +90,7 @@ for (countryIdx in 1:nrow(countryList)) {
     rbind(countryImportShocks)
   
   # detecting and recording shocks in exports
-  countryExportShocks <- findTradeShocks(exportData, countryTradeNameSearch) %>%
+  countryExportShocks <- findTradeShocks(exportData, countryTradeName) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
