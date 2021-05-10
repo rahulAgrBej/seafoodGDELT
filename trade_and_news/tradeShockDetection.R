@@ -79,10 +79,10 @@ for (countryIdx in 1:nrow(countryList)) {
   
   print(countryTradeName)
   
-  countryTradeName <- paste('\\^', countryTradeName, '\\b', sep='')
+  countryTradeNameSearch <- paste('\\^', countryTradeName, '\\b', sep='')
   
   # detecting and recording shocks in imports
-  countryImportShocks <- findTradeShocks(importData, countryTradeName) %>%
+  countryImportShocks <- findTradeShocks(importData, countryTradeNameSearch) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
@@ -91,7 +91,7 @@ for (countryIdx in 1:nrow(countryList)) {
     rbind(countryImportShocks)
   
   # detecting and recording shocks in exports
-  countryExportShocks <- findTradeShocks(exportData, countryTradeName) %>%
+  countryExportShocks <- findTradeShocks(exportData, countryTradeNameSearch) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
