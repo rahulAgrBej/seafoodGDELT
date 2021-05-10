@@ -19,7 +19,7 @@ shock.id <- function(dat, thresh=0.25){
 }
 
 # finds shocks for trade data
-findTradeShocks <- function(tradeData, countryName) {
+findShocks <- function(tradeData, countryName) {
 
   countryData <- tradeData %>%
     filter(str_detect(CTY_NAME, countryName)) %>%
@@ -53,9 +53,11 @@ findTradeShocks <- function(tradeData, countryName) {
 # Trade data file paths and retrieval (PROCESSED VERSION)
 importFilePath <- 'data/trade/processed/original/imports.csv'
 exportFilePath <- 'data/trade/processed/original/exports.csv'
+newsFilePath <- 'data/news/processed/original/newsCounts.csv'
 
 importData <- read_csv(importFilePath)
 exportData <- read_csv(exportFilePath)
+newsData <- read_csv(newsFilePath)
 
 countryListPath <- 'data/relevantCountries.csv'
 countryList <- read_csv(countryListPath)
@@ -74,6 +76,13 @@ exportShocks <- data.frame(
   shock.event=numeric()
 )
 
+newsShocks <- data.frame(
+  CTY_NAME=character(),
+  cooks.d=numeric(),
+  residual=numeric(),
+  shock.event=numeric()
+)
+
 for (countryIdx in 1:nrow(countryList)) {
   countryTradeName <- countryList[countryIdx, ]$name
   countryNewsCode <- countryList[countryIdx, ]$code
@@ -81,7 +90,7 @@ for (countryIdx in 1:nrow(countryList)) {
   print(countryTradeName)
   
   # detecting and recording shocks in imports
-  countryImportShocks <- findTradeShocks(importData, countryTradeName) %>%
+  countryImportShocks <- findShocks(importData, countryTradeName) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
@@ -90,19 +99,30 @@ for (countryIdx in 1:nrow(countryList)) {
     rbind(countryImportShocks)
   
   # detecting and recording shocks in exports
-  countryExportShocks <- findTradeShocks(exportData, countryTradeName) %>%
+  countryExportShocks <- findShocks(exportData, countryTradeName) %>%
     cbind(data.frame(
       'CTY_NAME'=rep(countryTradeName, 48)
     ))
   
   exportShocks <- exportShocks %>%
     rbind(countryExportShocks)
+  
+  # detecting and recording shocks in news
+  countryNewsShocks <- findShocks(newsData, countryTradeName) %>%
+    cbind(data.frame(
+      'CTY_NAME'=rep(countryTradeName, 48)
+    ))
+  
+  newsShocks <- newsShocks %>%
+    rbind(countryNewsShocks)
 }
 
 # write all trade shock data to output files
 importShockPath <- 'data/trade/processed/original/importShocks.csv'
 exportShockPath <- 'data/trade/processed/original/exportShocks.csv'
+newsShockPath <- 'data/news/processed/original/newsShocks.csv'
 
 write_csv(importShocks, importShockPath)
 write_csv(exportShocks, exportShockPath)
+write_csv(newsShocks, newsShockPath)
 
