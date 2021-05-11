@@ -61,7 +61,6 @@ def tradeNewsCorr(tradeData, newsData):
 newsCountsPath = 'data/news/processed/original/newsCounts.csv'
 newsCounts = pd.read_csv(newsCountsPath)
 
-
 # Get trade shock data
 importDataPath = 'data/trade/processed/original/imports.csv'
 importData = pd.read_csv(importDataPath)
@@ -82,3 +81,26 @@ importCorrF.close()
 exportCorrF = open(exportCorrOutPath, 'w')
 exportCorrF.write(newsExportCorrs.to_csv(index=False))
 exportCorrF.close()
+
+importShocksPath = 'data/trade/processed/original/importShocks.csv'
+importShockData = pd.read_csv(importShocksPath)
+
+exportShocksPath = 'data/trade/processed/original/exportShocks.csv'
+exportShockData = pd.read_csv(exportShocksPath)
+
+importShockData['TOTAL'] = importShockData['residual'].map(lambda residual: abs(residual))
+exportShockData['TOTAL'] = exportShockData['residual'].map(lambda residual: abs(residual))
+
+newsImportResCorr = tradeNewsCorr(importShockData, newsCounts)
+newsExportResCorr = tradeNewsCorr(exportShockData, newsCounts)
+
+importResCorrPath = 'data/analysis/processed/original/importResCorr.csv'
+exportResCorrPath = 'data/analysis/processed/original/exportResCorr.csv'
+
+importResCorrF = open(importResCorrPath, 'w')
+importResCorrF.write(newsImportResCorr.to_csv(index=False))
+importResCorrF.close()
+
+exportResCorrF = open(exportResCorrPath, 'w')
+exportResCorrF.write(newsExportResCorr.to_csv(index=False))
+exportResCorrF.close()
