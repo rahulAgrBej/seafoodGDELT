@@ -5,10 +5,10 @@ library(tidyverse)
 
 newsArticleFiles <- data.frame(
   filePath = c(
-    'data/news/summary_table_2017.csv',
-    'data/news/summary_table_2018.csv',
-    'data/news/summary_table_2019.csv',
-    'data/news/summary_table_2020.csv'
+    'data/news/raw/summary_table_2017.csv',
+    'data/news/raw/summary_table_2018.csv',
+    'data/news/raw/summary_table_2019.csv',
+    'data/news/raw/summary_table_2020.csv'
   )
 )
 
