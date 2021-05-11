@@ -1,4 +1,6 @@
 
+library(tidyverse)
+
 # Get news articles
 
 newsArticleFiles <- data.frame(
@@ -69,7 +71,10 @@ newsCounts <- news %>%
   ungroup() %>%
   select(-c(code)) %>%
   right_join(countryFiller) %>%
-  mutate(TOTAL = replace_na(TOTAL, 0))
+  mutate(TOTAL = replace_na(TOTAL, 0)) %>%
+  arrange(CTY_NAME, YEAR) %>%
+  cbind(data.frame(
+    'MONTH_IDX'=rep(seq(1,48), nrow(countryCodeNameLookup))))
 
 newsCountsPath <- 'data/news/processed/original/newsCounts.csv'
 write_csv(newsCounts, newsCountsPath)
