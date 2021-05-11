@@ -10,7 +10,12 @@ def tradeNewsCorr(tradeData, newsData):
 
     tradeNewsCorrelations = {
         'CTY_NAME': [],
-        'CORR': []
+        'CORR_0': [],
+        'CORR_1': [],
+        'CORR_2': [],
+        'CORR_0_ABS': [],
+        'CORR_1_ABS': [],
+        'CORR_2_ABS': []
     }
 
     for country in countries:
@@ -26,15 +31,27 @@ def tradeNewsCorr(tradeData, newsData):
         countryNewsData = newsData[countryNewsData]
         countryNewsData = countryNewsData.sort_values(by=['MONTH_IDX'])
         
-        a = list(countryTradeData['TOTAL'])
-        b = list(countryNewsData['TOTAL'])
-        tradeNewsCorr, p_value = pearsonr(a, b)
-        if math.isnan(tradeNewsCorr):
-            tradeNewsCorr = 0
-        print(tradeNewsCorr)
+        newsShifts = [0,1,2]
+        correlations = []
+        for newsShift in newsShifts:
+            zeros = [0] * newsShift
+            newsList = list(countryTradeData['TOTAL'])
+            a = zeros + newsList[:(len(newsList) - newsShift)]
+            b = list(countryNewsData['TOTAL'])
+
+            tradeNewsCorr, p_value = pearsonr(a, b)
+            if math.isnan(tradeNewsCorr):
+                tradeNewsCorr = 0
+            
+            correlations.append(tradeNewsCorr)
 
         tradeNewsCorrelations['CTY_NAME'].append(country)
-        tradeNewsCorrelations['CORR'].append(tradeNewsCorr)
+        tradeNewsCorrelations['CORR_0'].append(correlations[0])
+        tradeNewsCorrelations['CORR_1'].append(correlations[1])
+        tradeNewsCorrelations['CORR_2'].append(correlations[2])
+        tradeNewsCorrelations['CORR_0_ABS'].append(abs(correlations[0]))
+        tradeNewsCorrelations['CORR_1_ABS'].append(abs(correlations[1]))
+        tradeNewsCorrelations['CORR_2_ABS'].append(abs(correlations[2]))
 
     tradeNewsCorrelationsDF = pd.DataFrame(data=tradeNewsCorrelations)
     
@@ -55,8 +72,8 @@ exportData = pd.read_csv(exportDataPath)
 newsImportCorrs = tradeNewsCorr(importData, newsCounts)
 newsExportCorrs = tradeNewsCorr(exportData, newsCounts)
 
-importCorrOutPath = 'data/trade/processed/original/importCorrs.csv'
-exportCorrOutPath = 'data/trade/processed/original/exportCorrs.csv'
+importCorrOutPath = 'data/analysis/processed/original/importCorrs.csv'
+exportCorrOutPath = 'data/analysis/processed/original/exportCorrs.csv'
 
 importCorrF = open(importCorrOutPath, 'w')
 importCorrF.write(newsImportCorrs.to_csv(index=False))
