@@ -1,6 +1,10 @@
 
 library(tidyverse)
 
+countryCodeNameLookupPath <- 'data/relevantCountries.csv'
+countryCodeNameLookup <- read_csv(countryCodeNameLookupPath) %>%
+  rename(CTY_NAME=name)
+
 # constructing filler table with all countries, all months and all years
 completeCountries <- read_csv('data/relevantCountries.csv') %>%
   select(name) %>%
@@ -29,8 +33,8 @@ write_csv(completeCountries, completeCountriesRefPath)
 
 
 # input files for imports and exports
-importsFilePath <- "data/level_hs_10/imports.csv"
-exportsFilePath <- "data/level_hs_10/exports.csv"
+importsFilePath <- "data/trade/level_hs_10/imports.csv"
+exportsFilePath <- "data/trade/level_hs_10/exports.csv"
 
 # IMPORTS=========================================================================
 # cleaning import data
@@ -51,7 +55,10 @@ importData <- importData %>%
 importData <- importData %>%
   group_by(CTY_NAME, MONTH, YEAR) %>%
   summarize(TOTAL = sum(QUANTITY)) %>%
-  mutate(TOTAL = replace_na(TOTAL, 0))
+  mutate(TOTAL = replace_na(TOTAL, 0)) %>%
+  arrange(CTY_NAME, YEAR) %>%
+  cbind(data.frame(
+    'MONTH_IDX'=rep(seq(1,48), nrow(countryCodeNameLookup))))
 
 # EXPORTS=========================================================================
 exportData <- read_csv(exportsFilePath)
@@ -72,11 +79,14 @@ exportData <- exportData %>%
 exportData <- exportData %>%
   group_by(CTY_NAME, MONTH, YEAR) %>%
   summarize(TOTAL = sum(QUANTITY)) %>%
-  mutate(TOTAL = replace_na(TOTAL, 0))
+  mutate(TOTAL = replace_na(TOTAL, 0)) %>%
+  arrange(CTY_NAME, YEAR) %>%
+  cbind(data.frame(
+    'MONTH_IDX'=rep(seq(1,48), nrow(countryCodeNameLookup))))
 
 # WRITES INFO TO SEPARATE FILES FOR REFERENCE LATER
-importsOutPath <- 'data/processed/original/imports.csv'
-exportsOutPath <- 'data/processed/original/exports.csv'
+importsOutPath <- 'data/trade/processed/original/imports.csv'
+exportsOutPath <- 'data/trade/processed/original/exports.csv'
 
 write_csv(importData, importsOutPath)
 write_csv(exportData, exportsOutPath)
