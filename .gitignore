@@ -14,3 +14,4 @@ __pycache__
 trade_and_news/data/trade/processed/original/
 trade_and_news/data/news/processed/original/
 trade_and_news/data/news/raw/
+trade_and_news/data/analysis/processed/original/
