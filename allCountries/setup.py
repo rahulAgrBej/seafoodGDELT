@@ -59,6 +59,19 @@ def allCombos():
 
     return combos
 
+def combosUS():
+    
+    sourceCountries = readCountries()
+    ids = sourceCountries.keys()
+
+    pairsUS = []
+    for id in ids:
+        if id != 'United States':
+            pairsUS.append(('United States', id))
+    
+    return pairsUS
+
+
 def addReq(q, country, startDate, startTime, endDate, endTime):
     req = []
     req.append(q)
