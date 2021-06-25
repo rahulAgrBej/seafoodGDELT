@@ -66,8 +66,8 @@ def combosUS():
 
     pairsUS = []
     for id in ids:
-        if id != 'United States':
-            pairsUS.append(('United States', id))
+        if id != 'US':
+            pairsUS.append(('US', id))
     
     return pairsUS
 

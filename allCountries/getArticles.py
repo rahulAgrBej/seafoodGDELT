@@ -112,7 +112,7 @@ def processResponse(data):
     
     return csvContent
 
-tmpDataFolder = 'tmpDataStorage2017/'
+tmpDataFolder = 'general_4_2020/'
 dataFileNames = os.listdir(tmpDataFolder)
 
 completeFreqData = []
@@ -214,7 +214,7 @@ for fName in dataFileNames:
         if len(leftoverResponseData) > 0:
             csvContent += processResponse(leftoverResponseData)
 
-    outFileName = f'articleResults/2017_part{str(counter)}.csv'
+    outFileName = f'general/round_4/2020_part{str(counter)}.csv'
     f = open(outFileName, 'w')
     f.write(csvContent)
     f.close()
