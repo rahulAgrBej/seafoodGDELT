@@ -71,6 +71,7 @@ def processResponse(data):
 
     for result in data:
         query = result['query_details']['title']
+        print(query)
         sourceCountryCode = query[-2:]
         
         # finds quotation marks
@@ -78,6 +79,12 @@ def processResponse(data):
 
         if len(indices) != 4:
             print("ERROR OCCURED FINDING QUOTATIONS")
+            # Patch for "United States" and then a 4 letter country
+            if len(indices) == 2:
+                print('fixed it')
+                indices.append(indices[1] + 1)
+                indices.append(indices[-1] + 4 + 1)
+
         
         startQuote = indices[0] + 1
         endQuote = indices[1]
@@ -112,7 +119,7 @@ def processResponse(data):
     
     return csvContent
 
-tmpDataFolder = 'general_4_2020/'
+tmpDataFolder = 'tmpData/2017_1/'
 dataFileNames = os.listdir(tmpDataFolder)
 
 completeFreqData = []
@@ -120,6 +127,8 @@ completeFreqData = []
 counter = 0
 
 for fName in dataFileNames:
+    if (fName != '-851_149.txt'):
+        continue
     fPath = os.path.join(tmpDataFolder,fName)
     f = open(fPath, 'r')
     currData = json.loads(f.read())
@@ -197,6 +206,8 @@ for fName in dataFileNames:
 
     for req in reqs:
 
+        print(req)
+
         batch.append(req)
 
         if len(batch) == API_REQ_LIMIT:
@@ -214,7 +225,7 @@ for fName in dataFileNames:
         if len(leftoverResponseData) > 0:
             csvContent += processResponse(leftoverResponseData)
 
-    outFileName = f'general/round_4/2020_part{str(counter)}.csv'
+    outFileName = f'general/round_1/2017_part{str(counter)}.csv'
     f = open(outFileName, 'w')
     f.write(csvContent)
     f.close()

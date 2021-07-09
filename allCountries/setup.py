@@ -90,7 +90,17 @@ def buildArticleCountsReqs(inQuery, combos, startDate, startTime, endDate, endTi
     allReqs = []
     
     for combo in combos:
-        query = f'\"{sourceCountries[combo[0]]}\" \"{sourceCountries[combo[1]]}\" ' + inQuery
+        if len(sourceCountries[combo[0]]) < 5:
+            sourceCountry0 = sourceCountries[combo[0]]
+        else:
+            sourceCountry0 = f'\"{sourceCountries[combo[0]]}\"'
+
+        if len(sourceCountries[combo[1]]) < 5:
+            sourceCountry1 = sourceCountries[combo[1]]
+        else:
+            sourceCountry1 = f'\"{sourceCountries[combo[1]]}\"'
+        
+        query = f'{sourceCountry0} {sourceCountry1} ' + inQuery
 
         for mId in MAIN_IDS:
             req = addReq(query, mId, startDate, startTime, endDate, endTime)
@@ -120,6 +130,9 @@ def sendCountReqs(reqs, batchSize):
             payload = {}
             payload['requestsSent'] = json.dumps(batch)
             resp = requests.get(FREQ_API_URL + "?" + urllib.parse.urlencode(payload))
+
+            print(batch)
+            print(resp.status_code)
             
             if resp.status_code == 200:
                 responseResults = resp.json()["results"]
@@ -131,6 +144,9 @@ def sendCountReqs(reqs, batchSize):
         payload = {}
         payload['requestsSent'] = json.dumps(batch)
         resp = requests.get(FREQ_API_URL + "?" + urllib.parse.urlencode(payload))
+
+        print(batch)
+        print(resp.status_code)
         
         if resp.status_code == 200:
 
